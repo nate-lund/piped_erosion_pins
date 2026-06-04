@@ -123,10 +123,8 @@ plot_all = function(points, cdfs) {
   stack = rast(cdfs) # Convert to raster stack
   rast = stack[["slope"]] # Pull slope raster
   
-  if (crs(rast) == "") {
-    crs(rast) <- "EPSG:32615"
-  }
-  
+  # Set CRS of raster to UTM 15N (it already is, but we must assign it)
+  crs(rast) <- "EPSG:32615"
   
   # Convert points dataframe to a usable sf
   pts_sf = st_as_sf(points,
@@ -134,6 +132,9 @@ plot_all = function(points, cdfs) {
                      crs = 4326) %>% # Points are recorded in WGS lat long
     st_transform(32615) %>% # Transform to UTM Zone 15N
     st_crop(ext(rast), warn = FALSE) # Crop points by DEM extent
+  
+  # Convert the raster to a dataframe, this is needed for targets reasons
+   rast_df = as.data.frame(rast, xy = TRUE)
   
   # Grab forest name for plotting and saving
   forest_name = gsub("topo-output_|\\.nc", "", basename(cdfs))

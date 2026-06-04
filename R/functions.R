@@ -17,7 +17,7 @@ pull_dems = function(file){
   key = "a87bd1c14527afae952eb48288ca7ec3"
   # Coordiante system should be local UTM Zone
   
-  # Assign bounding boxes using a lookup table
+  # Assign bounding boxes using a lookup table. If more forets are needed, add.
   coords <- tribble(
     ~forest, ~lat, ~lon,
     "ASH", 44.85988792640071, -93.62056309340343,
@@ -110,38 +110,49 @@ pull_dems = function(file){
 #================================ Plot DEMs ================================
 
 #' [Test code]
-cdf = "C:/Users/natha/Documents/_git_projects/piped_erosion_pins/_topo_outputs/topo-output_ASH.nc"
+#points = get_points("C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv")
 
-rast = rast(cdf)
-dem = rast[[3]]
-
-
-plot(dem)
-
-plot_points = points %>% filter(Forest == "ASH")
-
-plot_points$esrignss_longitude
-plot_points$esrignss_latitude
-
-pts_sf <- st_as_sf(plot_points, coords = c("esrignss_longitude", "esrignss_latitude"), crs = 4326) %>%
-  st_transform(32615)
-
-pts_sf$geometry
-
-ggplot() +
-  geom_spatraster(data = dem) +
-  geom_sf(data = pts_sf, color = "red", size = 2) +
-  scale_fill_viridis_c(na.value = "transparent") +
-  theme_minimal()
+#cdfs = "C:/Users/natha/Documents/_git-projects/piped_erosion_pins/_topo_outputs/topo-output_LRJ.nc"
 
 
+# Define function to plot points and slope raster on same plot. This will be done via 
+# branching for each cdf path but using all the points.
+plot_all = function(points, cdfs) {
+  
+  # Extract slope from CDF
+  stack = rast(cdfs) # Convert to raster stack
+  rast = stack[["slope"]] # Pull slope raster
+  
+  if (crs(rast) == "") {
+    crs(rast) <- "EPSG:32615"
+  }
+  
+  
+  # Convert points dataframe to a usable sf
+  pts_sf = st_as_sf(points,
+                     coords = c("esrignss_longitude", "esrignss_latitude"),
+                     crs = 4326) %>% # Points are recorded in WGS lat long
+    st_transform(32615) %>% # Transform to UTM Zone 15N
+    st_crop(ext(rast), warn = FALSE) # Crop points by DEM extent
+  
+  # Grab forest name for plotting and saving
+  forest_name = gsub("topo-output_|\\.nc", "", basename(cdfs))
+  
+  # Create plot
+  ggplot = ggplot() +
+    geom_spatraster(data = rast) +
+    geom_sf(data = pts_sf, color = "red", size = 2) +
+    scale_fill_viridis_c(na.value = "transparent") +
+    ggtitle(forest_name) +
+    theme_minimal()
+  
+  forest_name = gsub("topo-output_|\\.nc", "", basename(cdfs))
+  out_path = paste0("_plot_outputs/plot_", forest_name, ".png")
+  ggsave(out_path, ggplot, width = 8, height = 6)
+  
+  return(out_path)
 
-
-  plot(r)
-
-  return()
 }
-
 
 
 

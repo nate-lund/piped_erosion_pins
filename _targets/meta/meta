@@ -1,7 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
-find_data|stem|974ac6cb985e2a01|7e72c91c3f1a5fd9|2c530c1562a7fbd1|-1994645127||t20599.8294049299s|s119b|119|rds|local|vector|||0||
 merge|stem||fae660c0f2c1afbc|3683e11989611219|1306762701||t20599.858092924s||0|rds|local|vector|||0.11|no non-missing arguments to min; returning Inf. no non-missing arguments to max; returning -Inf|need finite 'ylim' values
-points|stem|a4c6c177c46fe49c|7b399feaec459152|1b34a2d229a26ba6|-1464275451||t20599.8706662185s|s2643b|2643|rds|local|vector|||0.17||
 dems|pattern|80540d40ccbf13c4|0244c8656a69f4b5||-712505070||||2894916|file|local|vector||dems_e484efeeb0931a9f*dems_655a69b5322be6c4*dems_984382f71733435f*dems_da7c7785e569024c*dems_57e3177d05d4a9e3*dems_be9f18ff3b78fb30|0||
 dem_plots_ea55af7c1ca82eef|branch|5d840506637a8b89|18b573f84c165507|15d0403087a3e4e2|-1438317174||t20599.8884974278s|s43b|43|rds|local|vector|dem_plots||0.53||
 dem_plots_8e53032a3f492aa0|branch|5d840506637a8b89|18b573f84c165507|17794e518ed63070|-726552340||t20599.8885026381s|s43b|43|rds|local|vector|dem_plots||0.41||
@@ -21,19 +19,29 @@ plot_dem|function|2e05e4b8c20a7382
 dems_files|stem|c5fd4d3885964781|3b52ac1fea646f26|f46f193df8adfaa7|-2039583989||t20599.8990619761s|s104b|104|rds|local|vector||dems_files_b92951cc25e582e7*dems_files_4d8410341eb1bea1*dems_files_2f637d550419a772*dems_files_b3b36792a5688207*dems_files_320b5db88148edf7*dems_files_180aa28b970d7cfa|0||
 assign_slope|function|2f6899da712ce6e9
 dem_plots_3ec53da55a645a85|branch||fbd568913f569f13|afa10ad1a288c485|1071515923||t20608.6337051027s||0|rds|local|vector|dem_plots||0.02||could not find function 'plot_dem'
-libs|object|85943f927b0ba76a
+cdfs|pattern|7e3da29f0788e14d|0d260f17cbbb0ef2||-1083873008||||2894916|file|local|vector||cdfs_8e57bf1e601b7b00*cdfs_b7478143786146b3*cdfs_a1c7eeafe12b3b76*cdfs_9478f58669e9cc26*cdfs_e12e104faeb3de2e*cdfs_ba4b258d9d80cc1d|0||
+data_folder|object|99573bfbbee48689
+hert|function|42960ac84ba9e3a9
+find_data|stem|dfdb7632fb5c0a83|7e72c91c3f1a5fd9|2c530c1562a7fbd1|-1994645127||t20608.7750367681s|s120b|120|rds|local|vector|||0||
+points|stem|e6b7872b9e8c5f37|7b399feaec459152|15738f2df4d023ee|-1464275451||t20608.7750382689s|s2649b|2649|rds|local|vector|||0.09||
+cdf_paths|stem|948693828bfb74ce|b4f83f22aa94c561|beba9ae7546437fd|453561794||t20608.7757992635s|s106b|106|rds|local|vector|||65.7||
+cdfs_8e57bf1e601b7b00|branch|7b6e4423194b02e6|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1588869013|_topo_outputs/topo-output_LRE.nc|t20608.7751669377s|s481276b|481276|file|local|vector|cdfs||0||
+cdfs_b7478143786146b3|branch|1b7db316b9143da3|0d260f17cbbb0ef2|2c530c1562a7fbd1|-2131718022|_topo_outputs/topo-output_LRW.nc|t20608.7752918549s|s481276b|481276|file|local|vector|cdfs||0||
+cdfs_a1c7eeafe12b3b76|branch|820e8b768b4b9d10|0d260f17cbbb0ef2|2c530c1562a7fbd1|894410992|_topo_outputs/topo-output_LRJ.nc|t20608.7754168646s|s481276b|481276|file|local|vector|cdfs||0||
+cdfs_9478f58669e9cc26|branch|cfc2042be170c095|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1967445829|_topo_outputs/topo-output_MAG.nc|t20608.7755408283s|s483696b|483696|file|local|vector|cdfs||0||
+cdfs_e12e104faeb3de2e|branch|bb3027cbc01172e3|0d260f17cbbb0ef2|2c530c1562a7fbd1|-703814438|_topo_outputs/topo-output_WD.nc|t20608.7756739657s|s483696b|483696|file|local|vector|cdfs||0||
+cdfs_ba4b258d9d80cc1d|branch|1de7c6c6e0d50ea0|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1916800234|_topo_outputs/topo-output_ASH.nc|t20608.7757991028s|s483696b|483696|file|local|vector|cdfs||0||
+libs|object|0777be22ee460ee0
 get_points|function|f27b6224f2a4ff2d
 pull_dems|function|c8dcf6b10d810513
-.Random.seed|object|d3b1d11af930bf7a
-data_folder|object|99573bfbbee48689
-installed_libs|object|8b814341ebbe9a97
-hert|function|42960ac84ba9e3a9
-cdf_paths|stem|c5fd4d3885964781|b4f83f22aa94c561|c2988109bca3129e|453561794||t20608.6388970433s|s104b|104|rds|local|vector|||155.73||
-cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20608.6388977017s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
-cdfs_8e57bf1e601b7b00|branch|7b6e4423194b02e6|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1588869013|_topo_outputs/topo-output_LRE.nc|t20608.6374621523s|s481276b|481276|file|local|vector|cdfs||0||
-cdfs_b7478143786146b3|branch|1b7db316b9143da3|0d260f17cbbb0ef2|2c530c1562a7fbd1|-2131718022|_topo_outputs/topo-output_LRW.nc|t20608.6379355821s|s481276b|481276|file|local|vector|cdfs||0||
-cdfs_a1c7eeafe12b3b76|branch|820e8b768b4b9d10|0d260f17cbbb0ef2|2c530c1562a7fbd1|894410992|_topo_outputs/topo-output_LRJ.nc|t20608.6384098015s|s481276b|481276|file|local|vector|cdfs||0||
-cdfs_9478f58669e9cc26|branch|cfc2042be170c095|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1967445829|_topo_outputs/topo-output_MAG.nc|t20608.6386503023s|s483696b|483696|file|local|vector|cdfs||0||
-cdfs_e12e104faeb3de2e|branch|bb3027cbc01172e3|0d260f17cbbb0ef2|2c530c1562a7fbd1|-703814438|_topo_outputs/topo-output_WD.nc|t20608.6387737332s|s483696b|483696|file|local|vector|cdfs||0||
-cdfs_ba4b258d9d80cc1d|branch|1de7c6c6e0d50ea0|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1916800234|_topo_outputs/topo-output_ASH.nc|t20608.6388970204s|s483696b|483696|file|local|vector|cdfs||0||
-cdfs|pattern|7e3da29f0788e14d|0d260f17cbbb0ef2||-1083873008||||2894916|file|local|vector||cdfs_8e57bf1e601b7b00*cdfs_b7478143786146b3*cdfs_a1c7eeafe12b3b76*cdfs_9478f58669e9cc26*cdfs_e12e104faeb3de2e*cdfs_ba4b258d9d80cc1d|0||
+.Random.seed|object|b53c044bd7a39210
+installed_libs|object|95af18e6c1b9836b
+plot_all|function|2e9c541f6f2a39b7
+cdfs_files|stem|948693828bfb74ce|50c28e3106e7e941|263304d7ac258ae0|-274305850||t20608.8076668824s|s106b|106|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
+plots_3ec53da55a645a85|branch|07bba880422e821b|c8e9e12ff809302f|d4eb636b8da1a5ae|1368965562|_plot_outputs/plot_LRE.png|t20608.8076794183s|s173847b|173847|file|local|vector|plots||0.94|attribute variables are assumed to be spatially constant throughout all geometries|
+plots_d85dd1aad079ed34|branch|faab41966d5ae066|c8e9e12ff809302f|268a7c33819e9f1b|624889608|_plot_outputs/plot_LRW.png|t20608.8076882226s|s174663b|174663|file|local|vector|plots||0.75|attribute variables are assumed to be spatially constant throughout all geometries|
+plots_7d0f38ebb2c3231a|branch|559ed6da21873673|c8e9e12ff809302f|0e8c41e3ee8f80ca|-1945136066|_plot_outputs/plot_LRJ.png|t20608.8076949539s|s173867b|173867|file|local|vector|plots||0.58|attribute variables are assumed to be spatially constant throughout all geometries|
+plots_ade62be95181540b|branch|914e005cbb6ae2e7|c8e9e12ff809302f|10ba61770b262369|-1074573094|_plot_outputs/plot_MAG.png|t20608.807703416s|s179044b|179044|file|local|vector|plots||0.73|attribute variables are assumed to be spatially constant throughout all geometries|
+plots_80409a4a775b9eca|branch|ff23510e7d9517b1|c8e9e12ff809302f|681e97bba518a514|356444827|_plot_outputs/plot_WD.png|t20608.8077102472s|s182017b|182017|file|local|vector|plots||0.58|attribute variables are assumed to be spatially constant throughout all geometries|
+plots_a9227a4e0becc29a|branch|75c0fc55b94e880b|c8e9e12ff809302f|d475dbf53910076e|1706500072|_plot_outputs/plot_ASH.png|t20608.8077168834s|s182017b|182017|file|local|vector|plots||0.56|attribute variables are assumed to be spatially constant throughout all geometries|
+plots|pattern|c4e61a0052320c50|c8e9e12ff809302f||765790996||||1065455|file|local|vector||plots_3ec53da55a645a85*plots_d85dd1aad079ed34*plots_7d0f38ebb2c3231a*plots_ade62be95181540b*plots_80409a4a775b9eca*plots_a9227a4e0becc29a|4.14||

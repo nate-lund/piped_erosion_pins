@@ -15,17 +15,6 @@ if (any(installed_libs == F)) {
 # load libraries
 lapply(libs, library, character.only = T)
 
-# enter the file path for the highest level folder you're working in 
-data_folder <- "C:/Users/natha/Box/_data/_spatial/_erosion-pins/"
-
-# when a file is needed, call the hert() function
-# for example; data_frame = read.csv(hert("more_data/measurements_data.csv"))
-hert <- function(file) {
-  file_path = paste(data_folder, file, sep = "")
-  return(file_path)
-}
-
-
 
 #================================ Targets ================================
 # Created by use_targets().
@@ -43,6 +32,9 @@ tar_option_set(
 # Run the R scripts in the R/ folder with your custom functions:
 tar_source("R/functions.R")
 # tar_source("other_functions.R") # Source other scripts as needed.
+
+
+#================================ Targets ================================
 
 # Replace the target list below with your own:
 list(
@@ -67,18 +59,20 @@ list(
   ),
   
   # Target 4: Tracks the actual files on disk, branches over them
-  tar_files( # This facilitate branching which is needed for the next step 
+  tar_files( # This facilitates branching which is needed for the next step 
     cdfs,
     cdf_paths
-  )#,
+  ),
   
   
-  # Target 5: plots dems and point data
-  # tar_target(
-  #   dem_plots,
-  #   plot_dem(cdfs, points),
-  #   pattern = map(cdfs)
-  # )
+  # Target 5: Plots rasters and point data together, unique plot for each forest
+  tar_target(
+    plots,
+    plot_all(points, cdfs),
+    pattern = map(cdfs),
+    format = "file",
+    error = "null" # Target will still finish, report NULL where errors occur
+  )
   
   
   # Target 6: Prep Erosion pin data
@@ -88,4 +82,4 @@ list(
   # Target 8: Analyze Erosion pin data
 )
   
-
+#tar_visnetwork()

@@ -6,8 +6,8 @@ get_points = function(path) {
   return(csv)
   }
 
-# Test code
-points = get_points("C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv")
+#' [Test code]
+#points = get_points("C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv")
 
 #================================ Pull DEMs ================================
 
@@ -100,17 +100,18 @@ pull_dems = function(file){
 }
 
 
-# Test code
-paths = pull_dems(points)
+#' [Test code]
+#paths = pull_dems(points)
 
 #================================ Plot DEMs ================================
 
-# Test code
-cdf = "C:/Users/natha/Documents/_git_projects/_erosion-pins_pipe/_topo_outputs/topo-output_ASH.nc"
+#' [Test code]
+cdf = "C:/Users/natha/Documents/_git_projects/piped_erosion_pins/_topo_outputs/topo-output_ASH.nc"
 
 rast = rast(cdf)
 dem = rast[[3]]
 
+plot(dem)
 
 ggplot() +
   tidyterra::geom_spatraster(data = dem) +
@@ -120,11 +121,11 @@ ggplot() +
 
 plot_dem <- function(cdf, points) {
   raster <- rast(cdf)
-  
-  
-  
+
+
+
   plot(r)
-  
+
   return()
 }
 

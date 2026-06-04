@@ -17,13 +17,14 @@ dems_984382f71733435f|branch|2784d7d94a6229f7|0244c8656a69f4b5|2c530c1562a7fbd1|
 dems_da7c7785e569024c|branch|50dbfae1205cd816|0244c8656a69f4b5|2c530c1562a7fbd1|267806294|_topo_outputs/topo-output_MAG.nc|t20599.8970943049s|s483696b|483696|file|local|vector|dems||0||
 dems_57e3177d05d4a9e3|branch|5e5d95dd2e2c7f97|0244c8656a69f4b5|2c530c1562a7fbd1|-27149918|_topo_outputs/topo-output_WD.nc|t20599.8975660922s|s483696b|483696|file|local|vector|dems||0||
 dems_be9f18ff3b78fb30|branch|ae1f6fae1b0224cf|0244c8656a69f4b5|2c530c1562a7fbd1|743195832|_topo_outputs/topo-output_ASH.nc|t20599.8979210208s|s483696b|483696|file|local|vector|dems||0||
+plot_dem|function|2e05e4b8c20a7382
+dems_files|stem|c5fd4d3885964781|3b52ac1fea646f26|f46f193df8adfaa7|-2039583989||t20599.8990619761s|s104b|104|rds|local|vector||dems_files_b92951cc25e582e7*dems_files_4d8410341eb1bea1*dems_files_2f637d550419a772*dems_files_b3b36792a5688207*dems_files_320b5db88148edf7*dems_files_180aa28b970d7cfa|0||
+cdf_paths|stem|c5fd4d3885964781|b4f83f22aa94c561|aa8270d00be45717|453561794||t20608.5862857789s|s104b|104|rds|local|vector|||63.62||
 libs|object|85943f927b0ba76a
 get_points|function|f27b6224f2a4ff2d
 pull_dems|function|f6853b75b5778bb6
-.Random.seed|object|face1095e70c75e7
-plot_dem|function|2e05e4b8c20a7382
+.Random.seed|object|076babf15b0fa304
 data_folder|object|99573bfbbee48689
 assign_slope|function|2f6899da712ce6e9
 installed_libs|object|8b814341ebbe9a97
 hert|function|42960ac84ba9e3a9
-dems_files|stem|c5fd4d3885964781|3b52ac1fea646f26|f46f193df8adfaa7|-2039583989||t20599.8990619761s|s104b|104|rds|local|vector||dems_files_b92951cc25e582e7*dems_files_4d8410341eb1bea1*dems_files_2f637d550419a772*dems_files_b3b36792a5688207*dems_files_320b5db88148edf7*dems_files_180aa28b970d7cfa|0||

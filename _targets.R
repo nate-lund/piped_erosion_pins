@@ -50,11 +50,13 @@ list(
     "C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv"
   ),
   
+  
   # Target 2: Import CSV into R
   tar_target(
     name = points,
     command = get_points(find_data)
   ),
+  
   
   # Target 3: Pull DEMs from OpenTopography API. Export as netCDF files
   tar_target(
@@ -72,11 +74,16 @@ list(
   # Target 5: plots dems and point data
   tar_target(
     dem_plots,
-    plot_dem(dems, points),
-    pattern = map(dems)
+    plot_dem(cdfs, points),
+    pattern = map(cdfs)
   )
   
+  
+  # Target 6: Prep Erosion pin data
+  
+  # Target 7: QAQC Erosion pin data
+  
+  # Target 8: Analyze Erosion pin data
 )
   
-tar_visnetwork()
 

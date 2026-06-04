@@ -4,7 +4,7 @@
 rm(list = ls(all.names = TRUE))
 
 # libraries needed
-libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "targets", "visNetwork", "tarchetypes")
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra")
 
 # install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -24,6 +24,8 @@ hert <- function(file) {
   file_path = paste(data_folder, file, sep = "")
   return(file_path)
 }
+
+
 
 #================================ Targets ================================
 # Created by use_targets().
@@ -68,15 +70,15 @@ list(
   tar_files( # This facilitate branching which is needed for the next step 
     cdfs,
     cdf_paths
-  ),
+  )#,
   
   
   # Target 5: plots dems and point data
-  tar_target(
-    dem_plots,
-    plot_dem(cdfs, points),
-    pattern = map(cdfs)
-  )
+  # tar_target(
+  #   dem_plots,
+  #   plot_dem(cdfs, points),
+  #   pattern = map(cdfs)
+  # )
   
   
   # Target 6: Prep Erosion pin data

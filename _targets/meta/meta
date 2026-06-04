@@ -19,12 +19,21 @@ dems_57e3177d05d4a9e3|branch|5e5d95dd2e2c7f97|0244c8656a69f4b5|2c530c1562a7fbd1|
 dems_be9f18ff3b78fb30|branch|ae1f6fae1b0224cf|0244c8656a69f4b5|2c530c1562a7fbd1|743195832|_topo_outputs/topo-output_ASH.nc|t20599.8979210208s|s483696b|483696|file|local|vector|dems||0||
 plot_dem|function|2e05e4b8c20a7382
 dems_files|stem|c5fd4d3885964781|3b52ac1fea646f26|f46f193df8adfaa7|-2039583989||t20599.8990619761s|s104b|104|rds|local|vector||dems_files_b92951cc25e582e7*dems_files_4d8410341eb1bea1*dems_files_2f637d550419a772*dems_files_b3b36792a5688207*dems_files_320b5db88148edf7*dems_files_180aa28b970d7cfa|0||
-cdf_paths|stem|c5fd4d3885964781|b4f83f22aa94c561|aa8270d00be45717|453561794||t20608.5862857789s|s104b|104|rds|local|vector|||63.62||
+assign_slope|function|2f6899da712ce6e9
+dem_plots_3ec53da55a645a85|branch||fbd568913f569f13|afa10ad1a288c485|1071515923||t20608.6337051027s||0|rds|local|vector|dem_plots||0.02||could not find function 'plot_dem'
 libs|object|85943f927b0ba76a
 get_points|function|f27b6224f2a4ff2d
-pull_dems|function|f6853b75b5778bb6
-.Random.seed|object|076babf15b0fa304
+pull_dems|function|c8dcf6b10d810513
+.Random.seed|object|d3b1d11af930bf7a
 data_folder|object|99573bfbbee48689
-assign_slope|function|2f6899da712ce6e9
 installed_libs|object|8b814341ebbe9a97
 hert|function|42960ac84ba9e3a9
+cdf_paths|stem|c5fd4d3885964781|b4f83f22aa94c561|c2988109bca3129e|453561794||t20608.6388970433s|s104b|104|rds|local|vector|||155.73||
+cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20608.6388977017s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
+cdfs_8e57bf1e601b7b00|branch|7b6e4423194b02e6|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1588869013|_topo_outputs/topo-output_LRE.nc|t20608.6374621523s|s481276b|481276|file|local|vector|cdfs||0||
+cdfs_b7478143786146b3|branch|1b7db316b9143da3|0d260f17cbbb0ef2|2c530c1562a7fbd1|-2131718022|_topo_outputs/topo-output_LRW.nc|t20608.6379355821s|s481276b|481276|file|local|vector|cdfs||0||
+cdfs_a1c7eeafe12b3b76|branch|820e8b768b4b9d10|0d260f17cbbb0ef2|2c530c1562a7fbd1|894410992|_topo_outputs/topo-output_LRJ.nc|t20608.6384098015s|s481276b|481276|file|local|vector|cdfs||0||
+cdfs_9478f58669e9cc26|branch|cfc2042be170c095|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1967445829|_topo_outputs/topo-output_MAG.nc|t20608.6386503023s|s483696b|483696|file|local|vector|cdfs||0||
+cdfs_e12e104faeb3de2e|branch|bb3027cbc01172e3|0d260f17cbbb0ef2|2c530c1562a7fbd1|-703814438|_topo_outputs/topo-output_WD.nc|t20608.6387737332s|s483696b|483696|file|local|vector|cdfs||0||
+cdfs_ba4b258d9d80cc1d|branch|1de7c6c6e0d50ea0|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1916800234|_topo_outputs/topo-output_ASH.nc|t20608.6388970204s|s483696b|483696|file|local|vector|cdfs||0||
+cdfs|pattern|7e3da29f0788e14d|0d260f17cbbb0ef2||-1083873008||||2894916|file|local|vector||cdfs_8e57bf1e601b7b00*cdfs_b7478143786146b3*cdfs_a1c7eeafe12b3b76*cdfs_9478f58669e9cc26*cdfs_e12e104faeb3de2e*cdfs_ba4b258d9d80cc1d|0||

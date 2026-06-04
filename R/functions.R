@@ -7,7 +7,7 @@ get_points = function(path) {
   }
 
 #' [Test code]
-#points = get_points("C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv")
+# points = get_points("C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv")
 
 #================================ Pull DEMs ================================
 
@@ -15,7 +15,7 @@ pull_dems = function(file){
   # OpenTopography USGS 1m DEM API: https://portal.opentopography.org/API/usgsdem
   # API key:
   key = "a87bd1c14527afae952eb48288ca7ec3"
-  
+  # Coordiante system should be local UTM Zone
   
   # Assign bounding boxes using a lookup table
   coords <- tribble(
@@ -43,7 +43,7 @@ pull_dems = function(file){
     delta_lat <- 200 / 111320 # Compute lat
     delta_long <- 200 / (111320 * cos(uleft[1] * pi / 180)) # Compute long, correcting for lat
     bright <- c(uleft[1] - delta_lat, uleft[2] + delta_long) # Compute bottom left corner
-    
+  
     # Pull elevation data from Opentopo API
     res <- GET(url = "https://portal.opentopography.org/API/usgsdem",
                query = list(datasetName = "USGS1m",
@@ -58,10 +58,14 @@ pull_dems = function(file){
       stop("API error for ", f, ": ", content(res, "text"))
     }
     
+    
     # Write elevation data to a temporary place then pull into a DEM
     tmp = tempfile(fileext = ".tif")
     writeBin(content(res, "raw"), tmp)
     dem = rast(tmp)
+    
+    # Reproject to UTM Zone 15N
+    dem = project(dem, "EPSG:32615")
     
     # Compute derivatives
     slope  <- terrain(dem, v = "slope", unit = "degrees")
@@ -111,16 +115,25 @@ cdf = "C:/Users/natha/Documents/_git_projects/piped_erosion_pins/_topo_outputs/t
 rast = rast(cdf)
 dem = rast[[3]]
 
+
 plot(dem)
 
-ggplot() +
-  tidyterra::geom_spatraster(data = dem) +
-  scale_fill_viridis_c(na.value = "transparent") +
-  theme_minimal() +
-  coord_sf(crs = st_crs(26918))
+plot_points = points %>% filter(Forest == "ASH")
 
-plot_dem <- function(cdf, points) {
-  raster <- rast(cdf)
+plot_points$esrignss_longitude
+plot_points$esrignss_latitude
+
+pts_sf <- st_as_sf(plot_points, coords = c("esrignss_longitude", "esrignss_latitude"), crs = 4326) %>%
+  st_transform(32615)
+
+pts_sf$geometry
+
+ggplot() +
+  geom_spatraster(data = dem) +
+  geom_sf(data = pts_sf, color = "red", size = 2) +
+  scale_fill_viridis_c(na.value = "transparent") +
+  theme_minimal()
+
 
 
 
@@ -129,15 +142,6 @@ plot_dem <- function(cdf, points) {
   return()
 }
 
-
-
-#================================ Assign Elevation and Slope ================================
-assign_slope = function(points, dems){
- 
-  
-  
-  
-}
 
 
 

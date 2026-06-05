@@ -103,8 +103,13 @@ list(
     lsplines,
     fit_lspines(differenced_pins),
     format = "file"
-  )
+  ),
   
+  # Target 11: Combining point (GPS) data and measurement data
+  tar_target(
+    points_mms,
+    combo(points, differenced_pins)
+  )
   )
   
 # tar_visnetwork()

@@ -369,3 +369,42 @@ fit_lspines = function(data4){
 }
 
 
+#================================ Combine points and mms ================================
+
+#' [Test code]
+#mms = read_excel("_stats_outputs/ls_data.xlsx")
+
+#points = get_points("C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv")
+
+
+combo = function(points, mms){
+  
+  # Simplify measurement data to have have only the overall elevation change at each pin
+  # and do a basic one-sample t-test to determine significance.
+  mms_data = mms %>% 
+    group_by(index) %>% 
+    filter(date == max(date)) %>% # Select only last measurement
+    ungroup() %>% 
+    
+    # Fit linear models to get mean change of each 'array' (each forest, slope_pos, 
+    # transect combo) with summary statistics.
+    group_by(forest, slope_pos, transect) %>% 
+    summarise(
+      mean = as.numeric(tidy(lm(mm - 0 ~ 1))["estimate"]),
+      std_error = as.numeric(tidy(lm(mm - 0 ~ 1))["std.error"]),
+      p_value = as.numeric(tidy(lm(mm - 0 ~ 1))["p.value"]),
+      .groups = "drop"
+    ) %>% 
+    ungroup()
+  
+  # Clean up point data to remove extranious columns
+  points_data = points %>% 
+    select(forest, transect, slope_pos, esrignss_latitude, esrignss_longitude)
+  
+  points_mms <- left_join(mms_data, points_data, by = c("forest", "transect", "slope_pos"))
+  
+  return(points_mms)
+}
+
+
+

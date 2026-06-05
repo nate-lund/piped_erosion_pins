@@ -4,7 +4,7 @@
 rm(list = ls(all.names = TRUE))
 
 # libraries needed
-libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra")
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson")
 
 # install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -70,16 +70,45 @@ list(
     plots,
     plot_all(points, cdfs),
     pattern = map(cdfs),
-    format = "file",
     error = "null" # Target will still finish, report NULL where errors occur
+  ),
+  
+  
+  # Target 6: Pull erosion pin data
+  tar_target(
+    raw_measurements,
+    pull_measurements("C:/Users/natha/Box/_data/_erosion_pins/ARB-LR_raw.xlsx", "2025")
+  ),
+  
+  # Target 7: Clean up erosion pin data
+  tar_target(
+    clean_data,
+    data_cleanup(raw_measurements)
+  ),
+  
+  # Target 8: Difference erosion pins 
+  tar_target(
+    differenced_pins,
+    difference_pins(clean_data)
+  ),
+
+  # Target 9: QAQC
+  tar_target(
+    QAQC,
+    differenced_QAQC(differenced_pins)
+  ),
+  
+  # Target 10: Fitting splines
+  tar_target(
+    lsplines,
+    fit_lspines(differenced_pins),
+    format = "file"
   )
   
+  )
   
-  # Target 6: Prep Erosion pin data
-  
-  # Target 7: QAQC Erosion pin data
-  
-  # Target 8: Analyze Erosion pin data
-)
-  
-#tar_visnetwork()
+# tar_visnetwork()
+
+# tar_make()
+
+# tar_read(differenced_pins)

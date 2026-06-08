@@ -20,15 +20,15 @@ pull_dems = function(file){
   # Assign bounding boxes using a lookup table. If more forets are needed, add.
   coords <- tribble(
     ~forest, ~lat, ~lon,
-    "ASH", 44.85988792640071, -93.62056309340343,
-    "WD", 44.86146495117444, -93.62451266491821,
+    "ASH", 44.85988792640071, -93.61976309340343,
+    "WD", 44.86146495117444, -93.62371266491821,
     "MAG", 44.858404737541555, -93.61694284484315,
     "LRJ", 45.058482385228636, -93.76520775495264,
     "LRW", 45.05234713447312, -93.74745452030763,
-    "LRE", 45.05839520030076, -93.73859235869106
+    "LRE", 45.05909520030076, -93.73779235869106
   )
   
-  forests <- data.frame(forest = unique(file$Forest)) %>%
+  forests <- data.frame(forest = unique(file$forest)) %>%
     left_join(coords, by = "forest")
   
   # Build a vector to collect output file paths
@@ -40,8 +40,8 @@ pull_dems = function(file){
     
     # Establish bounding box
     uleft <- forests[i, 2:3] # Pull top left corner
-    delta_lat <- 200 / 111320 # Compute lat
-    delta_long <- 200 / (111320 * cos(uleft[1] * pi / 180)) # Compute long, correcting for lat
+    delta_lat <- 150 / 111320 # Compute lat
+    delta_long <- 150 / (111320 * cos(uleft[1] * pi / 180)) # Compute long, correcting for lat
     bright <- c(uleft[1] - delta_lat, uleft[2] + delta_long) # Compute bottom left corner
   
     # Pull elevation data from Opentopo API
@@ -107,17 +107,17 @@ pull_dems = function(file){
 #' [Test code]
 #paths = pull_dems(points)
 
-#================================ Plot ================================
+#================================ Plot Indiv ================================
 
 #' [Test code]
-#points = get_points("C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv")
+#points = tar_read(points_mms)
 
-#cdfs = "C:/Users/natha/Documents/_git-projects/piped_erosion_pins/_topo_outputs/topo-output_LRJ.nc"
+#cdfs = "C:/Users/natha/Documents/_git-projects/piped_erosion_pins/_topo_outputs/topo-output_MAG.nc"
 
 
 # Define function to plot points and slope raster on same plot. This will be done via 
 # branching for each cdf path but using all the points.
-plot_all = function(points, cdfs) {
+plot_each = function(points, cdfs) {
   
   # Extract slope from CDF
   stack = rast(cdfs) # Convert to raster stack
@@ -126,12 +126,16 @@ plot_all = function(points, cdfs) {
   # Set CRS of raster to UTM 15N (it already is, but we must assign it)
   crs(rast) <- "EPSG:32615"
   
+  # Convert p_value to 0.95 signifigance Y/N
+  points = points %>%
+    mutate(signif = ifelse(p_value <= 0.05, "Y", "N"))
+  
   # Convert points dataframe to a usable sf
   pts_sf = st_as_sf(points,
                      coords = c("esrignss_longitude", "esrignss_latitude"),
                      crs = 4326) %>% # Points are recorded in WGS lat long
     st_transform(32615) %>% # Transform to UTM Zone 15N
-    st_crop(ext(rast), warn = FALSE) # Crop points by DEM extent
+    st_crop(ext(rast)) # Crop points by DEM extent
   
   # Convert the raster to a dataframe, this is needed for targets reasons
   rast_df = as.data.frame(rast, xy = TRUE)
@@ -139,14 +143,68 @@ plot_all = function(points, cdfs) {
   # Grab forest name for plotting and saving
   forest_name = gsub("topo-output_|\\.nc", "", basename(cdfs))
   
+  
+  
   # Create plot
   ggplot = ggplot() +
     geom_raster(data = rast_df, aes(x = x, y = y, fill = slope)) +
-    geom_sf(data = pts_sf, color = "red", size = 2) +
-    scale_fill_viridis_c(na.value = "transparent") +
-    ggtitle(forest_name) +
-    theme_minimal()
+    geom_sf(data = pts_sf, aes(color = mean, shape = signif), size = 4) +
+    
+    # Slope/DEM colors
+    scale_fill_gradient2(
+      low = "grey",
+      mid = "beige",
+      high = "grey10",
+      na.value = "transparent",
+      midpoint = 15,
+      limits = c(0, 45),
+      name = "Slope (°)"
+    ) +
   
+    # Shape
+    scale_shape_manual(values = c("Y" = 17, "N" = 18), name = "Signifigance") +
+    
+    # Point colors
+    scale_color_gradient2(
+      high = "darkblue",
+      mid = "mistyrose",
+      low = "red",
+      midpoint = 0,
+      name = "Change (mm)",
+      limits = c(-20, 10)  # Fixed scale across all plots
+    ) +
+    
+    ggtitle(forest_name) +
+    scale_x_continuous(labels = scales::number_format(accuracy = 0.001),
+                       name = "Lat.") +
+    scale_y_continuous(labels = scales::number_format(accuracy = 0.001),
+                       name = "Long.") +
+    
+    theme(legend.position = "right",
+          panel.grid.major.x = element_line(color = "white"),
+          panel.grid.major.y = element_blank(),
+          panel.grid.minor = element_blank(),
+          panel.background = element_blank(),
+          text = element_text(family = "sans"),
+          panel.border = element_blank(),
+          
+          strip.background = element_rect(
+            fill = "white",   # or any color
+            color = "white",  # border color
+            linewidth = 0.5
+          ),
+          
+          strip.text = element_text(
+            family = "sans",
+            #face = "oblique",
+            color = "black",
+            hjust = 0,   # left
+            vjust = 0  # vertical centering
+            )
+          )
+  
+  ggplot
+    
   # Also saves the plot to the _plots_outputs folder for furture reference
   out_path = paste0("_plot_outputs/plot_", forest_name, ".png")
   ggsave(out_path, ggplot, width = 8, height = 6)
@@ -154,6 +212,34 @@ plot_all = function(points, cdfs) {
   return(ggplot)
 
 }
+
+#================================ Plot All ================================
+
+#' [Test code]
+# plots = tar_read(indv_plots)
+
+plot_all = function(plots){
+  
+  # Strip legends and axis lables from plots
+  plots_stipped = lapply(plots, function(p) p + theme(legend.position = "none") +
+                           theme(axis.text = element_blank(),
+                                 axis.ticks = element_blank(),
+                                 axis.title = element_blank()))
+
+  
+  # Pull legend from a plot
+  legend = get_legend(plots[[4]] + theme(legend.position = "left"))
+  
+  # Plot together
+  plot_panel = plot_grid(plotlist = plots_stipped, ncol = 3)
+  grid = plot_grid(plot_panel, legend, rel_widths = c(1.2, 0.15))
+  
+  # Save plot as file
+  ggsave("_plot_outputs/all_plot.png", grid, width = 8, height = 6)
+  
+  return()
+}
+
 
 
 #================================ Pull measurements ================================
@@ -406,5 +492,52 @@ combo = function(points, mms){
   return(points_mms)
 }
 
+
+#================================ Pull slope at points ================================
+
+#' [Test code]
+#cdfs = "C:/Users/natha/Documents/_git-projects/piped_erosion_pins/_topo_outputs/topo-output_ASH.nc"
+
+#points = tar_read(points_mms)
+
+
+extract_slope = function(points, cdfs) {
+
+  # Extract slope from CDF
+  stack = rast(cdfs) # Convert to raster stack
+  rast = stack[["slope"]] # Pull slope raster
+  
+  # Set CRS of raster to UTM 15N (it already is, but we must assign it)
+  crs(rast) <- "EPSG:32615"
+  
+  # Convert points dataframe to a usable sf
+  pts_sf = st_as_sf(points,
+                    coords = c("esrignss_longitude", "esrignss_latitude"),
+                    crs = 4326) %>% # Points are recorded in WGS lat long
+    st_transform(32615) %>%  # Transform to UTM Zone 15N
+    st_crop(ext(rast)) # Crop points by DEM extent
+  
+  # Extract slope values at each point
+  extracted = terra::extract(rast, pts_sf)
+  
+  # Bind slope values back to the points
+  pts_sf$slope = extracted$slope
+  
+  
+  return(pts_sf)
+}
+
+
+#================================ Plot Eros/Slope ================================
+
+
+# data = as.data.frame(tar_read(points_mms_slope))
+# 
+# ggplot(data = data, mapping = aes(x = slope, y = mean)) +
+#   geom_point() +
+#   geom_smooth(method = "lm", se = TRUE)
+#   
+# lm = lm(data = data, mean ~ slope)
+# summary(lm)
 
 

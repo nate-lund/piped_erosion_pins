@@ -38,6 +38,9 @@ tar_source("R/functions.R")
 
 # Replace the target list below with your own:
 list(
+  
+  #================================ Points & DEMS ================================
+  
   # Target 1: Locate GPS locations based on file path
   tar_target(
     name = find_data,
@@ -64,56 +67,88 @@ list(
     cdf_paths
   ),
   
+  #================================ Plotting ================================
   
-  # Target 5: Plots rasters and point data together, unique plot for each forest
+  # Target 1: Plots rasters and point data together, unique plot for each forest
   tar_target(
-    plots,
-    plot_all(points, cdfs),
+    indv_plots,
+    plot_each(points_mms, cdfs),
     pattern = map(cdfs),
-    error = "null" # Target will still finish, report NULL where errors occur
+    iteration = "list"
   ),
   
+  # Target 2: Put plots in a list
+  tar_target(
+    all_plots,
+    plot_all(indv_plots)
+  ),
   
-  # Target 6: Pull erosion pin data
+  #================================ Measurements ================================
+  
+  # Target 4: Pull erosion pin data
   tar_target(
     raw_measurements,
     pull_measurements("C:/Users/natha/Box/_data/_erosion_pins/ARB-LR_raw.xlsx", "2025")
   ),
   
-  # Target 7: Clean up erosion pin data
+  
+  # Target 1: Clean up erosion pin data
   tar_target(
     clean_data,
     data_cleanup(raw_measurements)
   ),
   
-  # Target 8: Difference erosion pins 
+  
+  # Target 2: Difference erosion pins 
   tar_target(
     differenced_pins,
     difference_pins(clean_data)
   ),
 
-  # Target 9: QAQC
+  
+  # Target 3: QAQC
   tar_target(
     QAQC,
     differenced_QAQC(differenced_pins)
   ),
   
-  # Target 10: Fitting splines
+  
+  # Target 4: Fitting splines
   tar_target(
     lsplines,
     fit_lspines(differenced_pins),
     format = "file"
   ),
   
-  # Target 11: Combining point (GPS) data and measurement data
+  #================================ Combo ================================
+  
+  # Target 1: Combining point (GPS) data and measurement data
   tar_target(
     points_mms,
     combo(points, differenced_pins)
+  ),
+  
+  
+  # Target 2: Extract slope at each point
+  tar_target(
+    slope_extracted,
+    extract_slope(points_mms, cdfs),
+    pattern = map(cdfs)
+  ),
+  
+  
+  # Target 3: Combine all branches into one dataframe
+  tar_target(
+    points_mms_slope,
+    bind_rows(slope_extracted)
   )
+  
   )
   
 # tar_visnetwork()
 
 # tar_make()
 
-# tar_read(differenced_pins)
+# tar_meta(fields = error, complete_only = TRUE)
+
+# tar_read(all_plots)

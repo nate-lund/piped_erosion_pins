@@ -4,7 +4,7 @@
 rm(list = ls(all.names = TRUE))
 
 # libraries needed
-libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson")
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont")
 
 # install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -15,6 +15,8 @@ if (any(installed_libs == F)) {
 # load libraries
 lapply(libs, library, character.only = T)
 
+font_import()  # takes a few minutes, only need to do this once
+loadfonts(device = "win")
 
 #================================ Targets ================================
 # Created by use_targets().

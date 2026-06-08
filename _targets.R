@@ -15,8 +15,6 @@ if (any(installed_libs == F)) {
 # load libraries
 lapply(libs, library, character.only = T)
 
-font_import()  # takes a few minutes, only need to do this once
-loadfonts(device = "win")
 
 #================================ Targets ================================
 # Created by use_targets().

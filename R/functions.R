@@ -167,7 +167,7 @@ plot_each = function(points, cdfs) {
     # Point colors
     scale_color_gradient2(
       high = "darkblue",
-      mid = "mistyrose",
+      mid = "darkred",
       low = "red",
       midpoint = 0,
       name = "Change (mm)",
@@ -231,7 +231,7 @@ plot_all = function(plots){
   legend = get_legend(plots[[4]] + theme(legend.position = "left"))
   
   # Plot together
-  plot_panel = plot_grid(plotlist = plots_stipped, ncol = 3)
+  plot_panel = plot_grid(plotlist = plots_stipped[c(6, 2, 1, 4, 5, 3)], ncol = 3)
   grid = plot_grid(plot_panel, legend, rel_widths = c(1.2, 0.15))
   
   # Save plot as file
@@ -526,6 +526,101 @@ extract_slope = function(points, cdfs) {
   
   return(pts_sf)
 }
+
+#================================ Plot dmm/dt ================================
+
+#' [Test code]
+# data <- read_excel("_stats_outputs/ls_data.xlsx")
+
+plot_mm_dt = function(data){
+
+# Need to make a index column for plotting
+plot_data = data %>% 
+  mutate(forest_date = interaction(forest,
+                                   date,
+                                   slope_pos,
+                                   sep = "_"),
+         # To ensure propoer ordering for facet_wrap
+         forest = factor(forest, levels = c("ASH", "LRW", "LRE", "MAG", "WD", "LRJ")))
+
+ggplot <- ggplot(data = plot_data, mapping = aes(x = date, y = mm)) +
+  
+  # Plot the lines tracking each pin, color by slope position
+  geom_line(aes(group = index,
+                color =  slope_pos),
+            linetype = 1) +
+  
+  # Plot boxplots for each forest and slope position
+  geom_boxplot(aes(group = forest_date,
+                   width = 3,
+                   fill = slope_pos)) +
+  
+  # Plot lspline fits
+  geom_line(#data = plot_data,
+            aes(x = date,
+                y = predic,
+                linetype = slope_pos),
+            linewidth = 1) +
+  
+  facet_wrap(~forest, ncol = 3) + 
+  
+  # Visuals
+  scale_color_manual(
+    name = "Slope Position",
+    values = c(
+      "FS" = "royalblue2",
+      "BS" = "indianred2"
+    )) +
+  
+  scale_fill_manual(
+    name = "Slope Position",
+    values = c(
+      "FS" = "royalblue2",
+      "BS" = "indianred2"
+    )) +
+  
+  scale_linetype_discrete(name = "Slope Position") +
+  
+  scale_y_continuous( 
+    limits = c(-20, 20),
+    name = "Adjusted Height (mm)") + # May cut off some outliers, fine for visualization
+  scale_x_date(limits = c(ymd("2025-07-10"), ymd("2025-10-01")),
+               name = "Date",
+               date_breaks = "1 month", date_labels = "%b") + # Remove this section for Par-Sci
+  geom_hline(yintercept = 0, linewidth = 0.5) +
+  theme(legend.position = "bottom",
+        panel.grid.major.x = element_line(color = "white"),
+        panel.grid.major.y = element_blank(),
+        panel.grid.minor = element_blank(),
+        panel.background = element_blank(),
+        text = element_text(family = "sans"),
+        panel.border = element_rect(color = "black", fill = NA, linewidth = 0.5),
+        
+        strip.background = element_rect(
+          fill = "white",   # or any color
+          color = "white",  # border color
+          linewidth = 0.5
+        ),
+        
+        strip.text = element_text(
+          family = "sans",
+          #face = "oblique",
+          color = "black",
+          hjust = 0,   # left
+          vjust = 0  # vertical centering
+          
+        )
+        
+  ) 
+
+
+ggsave("_plot_outputs/mms_plot.png", ggplot, width = 9, height = 6, dpi = 900)
+
+return(ggplot)
+}
+
+
+
 
 
 #================================ Plot Eros/Slope ================================

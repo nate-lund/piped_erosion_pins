@@ -77,11 +77,31 @@ list(
     iteration = "list"
   ),
   
-  # Target 2: Put plots in a list
+  # Target 2: Put dem/point plots in a list
   tar_target(
     all_plots,
     plot_all(indv_plots)
   ),
+  
+  # Target 3: Plot mms over time for each forests
+  tar_target(
+    plot_mmdt,
+    plot_mm_dt(lsplines)
+  ),
+  
+  #================================ Tabels ================================
+  
+  # Target 1: Make df for mms over time
+  tar_target(
+    mms_frame,
+    frame_mmdt(lsplines)
+    ),
+  
+  # Target 2: Make a nice publication-quality table for mms over time 
+  # tar_target(
+  #   mms_table,
+  #   table_mmdt(mms_df)
+  # ),
   
   #================================ Measurements ================================
   
@@ -116,8 +136,7 @@ list(
   # Target 4: Fitting splines
   tar_target(
     lsplines,
-    fit_lspines(differenced_pins),
-    format = "file"
+    fit_lspines(differenced_pins)
   ),
   
   #================================ Combo ================================

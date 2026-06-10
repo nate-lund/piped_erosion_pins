@@ -447,11 +447,20 @@ fit_lspines = function(data4){
     
   } # End loop
   
+  
+  # Drop intercept coefs from all_coefs
+  all_coefs = all_coefs %>% 
+    filter(term != "(Intercept)")
+  
+  # Join measuremenet data (w/ lspline predictions) with lslope coefs data frame
+  fit_data = left_join(ls_data, all_coefs, by = c("forest", "date", "slope_pos"))
+  
   # Write to _stats_output
-  write_xlsx(ls_data, "_stats_outputs/ls_data.xlsx")
-  write_xlsx(all_coefs, "_stats_outputs/all_coefs.xlsx")
+  path = "_stats_outputs/fit_data.xlsx"
+  write_xlsx(fit_data, path)
  
-  return() 
+  
+  return(path)
 }
 
 
@@ -527,13 +536,228 @@ extract_slope = function(points, cdfs) {
   return(pts_sf)
 }
 
+
+#================================ Frame mms ================================
+
+#' [Test code]
+# data = read_xlsx("_stats_outputs/fit_data.xlsx")
+
+frame_mmdt = function(path){
+  
+  data = read_xlsx(path)
+  
+  # Build table of raw data
+  table_data <- data %>%
+    
+    # Summarize to get one estimate for each slope_pos, forest, and date, this
+    # does not change any numbers, just collapses rows with repeated estimates
+    select(term, forest, slope_pos, estimate, std.error, p.value) %>%  
+    distinct() %>% 
+  
+    # Round estimate values (mm/day)
+    mutate(estimate = round(estimate, digits = 3)) %>% 
+    mutate(std.error = round(std.error, digits = 3)) %>%
+    mutate(p.value = round(p.value, digits = 3)) %>%
+    
+    # Rename terms to something more recognizable
+    mutate(term = case_when(
+      term == "lspline(date, knots = knots)1" ~ "slope.1",
+      term == "lspline(date, knots = knots)2" ~ "slope.2",
+      term == "lspline(date, knots = knots)3" ~ "slope.3",
+      term == "lspline(date, knots = knots)4" ~ "slope.4",
+      term == "lspline(date, knots = knots)5" ~ "slope.5"
+    )) %>% 
+    
+    pivot_wider(
+      names_from = term,
+      values_from = c(estimate, std.error, p.value)
+    )
+  
+ return(table_data) 
+}
+
+
+
+#================================ Pub Table mms ================================
+
+#' [Test code]
+# frame = tar_read(mms_frame)
+
+table_mmdt = function(frame){
+  
+  # Remove duplicated forest names
+  H3_final_table.df <- H3_final_table.df %>%
+    mutate(forest = as.character(forest)) %>%
+    group_by(forest) %>%
+    mutate(forest = ifelse(row_number() == 1, forest, "")) %>%
+    ungroup()
+  
+  
+  
+  
+  
+  
+  # Add data and format table
+  H3_mm_over_time.ft <- flextable(H3_final_table.df,
+                                  col_keys = c("forest",
+                                               "slope_pos",
+                                               "blank",
+                                               "estimate_slope.1",
+                                               "std.error_slope.1",
+                                               #"p.value_slope.1",
+                                               "blank1",
+                                               "estimate_slope.2",
+                                               "std.error_slope.2",
+                                               #"p.value_slope.2",
+                                               "blank2",
+                                               "estimate_slope.3",
+                                               "std.error_slope.3",
+                                               #"p.value_slope.3",
+                                               "blank3",
+                                               "estimate_slope.4",
+                                               "std.error_slope.4",
+                                               #"p.value_slope.4",
+                                               "blank4",
+                                               "estimate_slope.5",
+                                               "std.error_slope.5"
+                                               #"p.value_slope.5"))
+                                  ))%>% 
+    empty_blanks() %>%
+    
+    font(part = "all", fontname = "Calibri") %>% 
+    fontsize(part = "all", size = 11) %>% 
+    
+    align(align = "center", part = "all") %>% 
+    valign(valign = "center", part = "header") %>% 
+    
+    
+    # All
+    font(part = "all", fontname = "Calibri") %>% 
+    fontsize(part = "all", size = 11) %>% 
+    align(align = "right", part = "all") %>%
+    
+    # Header
+    align(align = "center", part = "header") %>%
+    valign(valign = "center", part = "header") %>% 
+    
+    width(j = c("forest",
+                "slope_pos",
+                "estimate_slope.1",
+                "std.error_slope.1",
+                "estimate_slope.2",
+                "std.error_slope.2",
+                "estimate_slope.3",
+                "std.error_slope.3",
+                "estimate_slope.4",
+                "std.error_slope.4",
+                "estimate_slope.5",
+                "std.error_slope.5"), width = 0.7) %>% 
+    #width(j = "landcover", width = 3.5) %>% 
+    
+    line_spacing(space = 1.8, part = "header") %>% 
+    
+    # Landcover
+    #align(align = "left", part = "center", j = "landcover") %>% 
+    #align(align = "left", j = "landcover") %>% 
+    
+    
+    # * all significant values
+    mk_par(j = "estimate_slope.1",
+           i = ~ p.value_slope.1 < 0.05,
+           value = as_paragraph(
+             estimate_slope.1,
+             "*"
+           )) %>% 
+    mk_par(j = "estimate_slope.2",
+           i = ~ p.value_slope.2 < 0.05,
+           value = as_paragraph(
+             estimate_slope.2,
+             "*"
+           )) %>% 
+    mk_par(j = "estimate_slope.3",
+           i = ~ p.value_slope.3 < 0.05,
+           value = as_paragraph(
+             estimate_slope.3,
+             "*"
+           )) %>% 
+    mk_par(j = "estimate_slope.4",
+           i = ~ p.value_slope.4 < 0.05,
+           value = as_paragraph(
+             estimate_slope.4,
+             "*"
+           )) %>% 
+    mk_par(j = "estimate_slope.5",
+           i = ~ p.value_slope.5 < 0.05,
+           value = as_paragraph(
+             estimate_slope.5,
+             "*"
+           )) %>% 
+    
+    # Add +/- to errors
+    set_formatter(
+      m_error_slope.1  = function(x) ifelse(x != 0, paste0("± ", x, "")),
+      m_error_slope.2  = function(x) ifelse(x != 0, paste0("± ", x, "")),
+      m_error_slope.3  = function(x) ifelse(x != 0, paste0("± ", x, "")),
+      m_error_slope.4  = function(x) ifelse(x != 0, paste0("± ", x, "")),
+      m_error_slope.5  = function(x) ifelse(x != 0, paste0("± ", x, ""))
+    ) %>% 
+    
+    
+    # Color erosion values
+    color(~ estimate_slope.1 < 0, color = "red2", j = "estimate_slope.1") %>% 
+    color(~ estimate_slope.2 < 0, color = "red2", j = "estimate_slope.2") %>% 
+    color(~ estimate_slope.3 < 0, color = "red2", j = "estimate_slope.3") %>% 
+    color(~ estimate_slope.4 < 0, color = "red2", j = "estimate_slope.4") %>% 
+    color(~ estimate_slope.5 < 0, color = "red2", j = "estimate_slope.5") %>% 
+    
+    add_header_row(values = c("",
+                              "Period 1",
+                              "Period 2",
+                              "Period 3",
+                              "Period 4",
+                              "Period 5"),
+                   colwidths = c(2, # adds up to total number of cols
+                                 3,
+                                 3,
+                                 3,
+                                 3,
+                                 3)) %>% 
+    
+    labelizor(
+      part = "header", 
+      labels = c("forest" = "Site",
+                 "slope_pos" = "Slope Position",
+                 "estimate_slope.1" = "Erosion (cm/yr)",
+                 "std.error_slope.1" = "Std. Error",
+                 #"p.value_slope.1" = "p-value",
+                 "estimate_slope.2" = "Erosion (cm/yr)",
+                 "std.error_slope.2" = "Std. Error",
+                 #"p.value_slope.2" = "p-value",
+                 "estimate_slope.3" = "Erosion (cm/yr)",
+                 "std.error_slope.3" = "Std. Error",
+                 #"p.value_slope.3" = "p-value",
+                 "estimate_slope.4" = "Erosion (cm/yr)",
+                 "std.error_slope.4" = "Std. Error",
+                 #"p.value_slope.4" = "p-value",
+                 "estimate_slope.5" = "Erosion (cm/yr)",
+                 "std.error_slope.5" = "Std. Error"
+                 #"p.value_slope.5" = "p-value"
+      ))
+  
+  H3_mm_over_time.ft
+  
+}
+
+
 #================================ Plot dmm/dt ================================
 
 #' [Test code]
-# data <- read_excel("_stats_outputs/ls_data.xlsx")
+# data <- read_excel("_stats_outputs/fit_data.xlsx")
 
-plot_mm_dt = function(data){
+plot_mm_dt = function(path){
 
+  data = read_excel(path)
+  
 # Need to make a index column for plotting
 plot_data = data %>% 
   mutate(forest_date = interaction(forest,
@@ -541,7 +765,11 @@ plot_data = data %>%
                                    slope_pos,
                                    sep = "_"),
          # To ensure propoer ordering for facet_wrap
-         forest = factor(forest, levels = c("ASH", "LRW", "LRE", "MAG", "WD", "LRJ")))
+         forest = factor(forest, levels = c("ASH", "LRW", "LRE", "MAG", "WD", "LRJ")),
+         
+         # A Catagorical signifigance column
+         signif = ifelse(p.value <= 0.05, "Y", "N")
+         )
 
 ggplot <- ggplot(data = plot_data, mapping = aes(x = date, y = mm)) +
   

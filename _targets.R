@@ -1,4 +1,4 @@
-#================================ Setup ================================
+#================================ Packages ================================
 
 # Clear environment
 rm(list = ls(all.names = TRUE))
@@ -16,11 +16,7 @@ if (any(installed_libs == F)) {
 lapply(libs, library, character.only = T)
 
 
-#================================ Targets ================================
-# Created by use_targets().
-# Follow the comments below to fill in this target script.
-# Then follow the manual to check and run the pipeline:
-#   https://books.ropensci.org/targets/walkthrough.html#inspect-the-pipeline
+#================================ Setup ================================
 
 # Set target options:
 tar_option_set(
@@ -29,73 +25,70 @@ tar_option_set(
                "visNetwork", "tarchetypes", "tidyterra") # Packages that your targets need for their tasks.
 )
 
-# Run the R scripts in the R/ folder with your custom functions:
-tar_source("R/functions.R")
-# tar_source("other_functions.R") # Source other scripts as needed.
+# Run the R scripts in the R/ folder with functions
+tar_source(
+    # Contains functions that rely exclusively on erosion pin measurement data.
+    "R/measurements-functions.R"
+)
+
+tar_source(
+    # Contains functions that use spatial data. 
+    "R/spatial-functions.R"
+)
+
+tar_source(
+    # Contains functions that integrate spatial and measurement data. 
+    "R/integrated-functions.R"
+    )
+
+
 
 
 #================================ Targets ================================
 
 # Replace the target list below with your own:
 list(
-  
-  #================================ Points & DEMS ================================
-  
-  # Target 1: Locate GPS locations based on file path
+  ## Pull erosion pin measurement data ====
   tar_target(
-    name = find_data,
-    "C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv"
+    raw_measurements,
+    pull_measurements("C:/Users/natha/Box/_data/_erosion_pins/ARB-LR_raw.xlsx", "2025")
   ),
   
-  
-  # Target 2: Import CSV into R
+  ## Clean up erosion pin data ====
   tar_target(
-    name = points,
-    command = get_points(find_data)
+    clean_data,
+    data_cleanup(raw_measurements)
   ),
   
-  
-  # Target 3: Pull DEMs from OpenTopography API. Export as netCDF files
+  ## Difference erosion pins ====
   tar_target(
-    cdf_paths,
-    pull_dems(points)
+    differenced_pins,
+    difference_pins(clean_data)
   ),
   
-  # Target 4: Tracks the actual files on disk, branches over them
-  tar_files( # This facilitates branching which is needed for the next step 
-    cdfs,
-    cdf_paths
-  ),
-  
-  #================================ Plotting ================================
-  
-  # Target 1: Plots rasters and point data together, unique plot for each forest
+  ## QAQC Measurement data ====
   tar_target(
-    indv_plots,
-    plot_each(points_mms, cdfs),
-    pattern = map(cdfs),
-    iteration = "list"
+    QAQC,
+    differenced_QAQC(differenced_pins)
   ),
   
-  # Target 2: Put dem/point plots in a list
+  ## Fil lslpines to pins ====
   tar_target(
-    all_plots,
-    plot_all(indv_plots)
+    lsplines,
+    fit_lspines(differenced_pins)
   ),
   
-  # Target 3: Plot mms over time for each forests
+  ## Plot mms over time for each forests ====
   tar_target(
     plot_mmdt,
     plot_mm_dt(lsplines)
   ),
   
-  #================================ Tabels ================================
-  
-  # Target 1: Make df for mms over time
+  ## Make df for mms over time ====
   tar_target(
     mms_frame,
     frame_mmdt(lsplines)
-    ),
+  ),
   
   # Target 2: Make a nice publication-quality table for mms over time 
   # tar_target(
@@ -103,60 +96,58 @@ list(
   #   table_mmdt(mms_df)
   # ),
   
-  #================================ Measurements ================================
-  
-  # Target 4: Pull erosion pin data
+  ## Locate GPS locations based on file path ====
   tar_target(
-    raw_measurements,
-    pull_measurements("C:/Users/natha/Box/_data/_erosion_pins/ARB-LR_raw.xlsx", "2025")
+    name = find_data,
+    "C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv"
   ),
   
-  
-  # Target 1: Clean up erosion pin data
+  ## Import CSV into R ====
   tar_target(
-    clean_data,
-    data_cleanup(raw_measurements)
+    name = points,
+    command = get_points(find_data)
   ),
   
-  
-  # Target 2: Difference erosion pins 
+  ## Pull DEMs from OpenTopography API. Export as netCDF files ====
   tar_target(
-    differenced_pins,
-    difference_pins(clean_data)
-  ),
-
-  
-  # Target 3: QAQC
-  tar_target(
-    QAQC,
-    differenced_QAQC(differenced_pins)
+    cdf_paths,
+    pull_dems(points)
   ),
   
-  
-  # Target 4: Fitting splines
-  tar_target(
-    lsplines,
-    fit_lspines(differenced_pins)
+  ## Tracks the actual files on disk, branches over them ====
+  tar_files( # This facilitates branching which is needed for the next step 
+    cdfs,
+    cdf_paths
   ),
   
-  #================================ Combo ================================
+  ## Plots rasters and point data together, unique plot for each forest ====
+  tar_target(
+    indv_plots,
+    plot_each(points_mms, cdfs),
+    pattern = map(cdfs),
+    iteration = "list"
+  ),
   
-  # Target 1: Combining point (GPS) data and measurement data
+  ## Put dem/point plots in a list ====
+  tar_target(
+    all_plots,
+    plot_all(indv_plots)
+  ),
+  
+  ## Combine point (GPS) data and measurement data ====
   tar_target(
     points_mms,
     combo(points, differenced_pins)
   ),
   
-  
-  # Target 2: Extract slope at each point
+  ## Extract slope at each point ====
   tar_target(
     slope_extracted,
     extract_slope(points_mms, cdfs),
     pattern = map(cdfs)
   ),
   
-  
-  # Target 3: Combine all branches into one dataframe
+  ## Combine all branches into one dataframe ====
   tar_target(
     points_mms_slope,
     bind_rows(slope_extracted)

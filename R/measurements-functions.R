@@ -219,7 +219,9 @@ fit_lspines = function(data4){
   return(path)
 }
 
-#================================ Overall Stats by Transect ================================
+#================================ Summary Stats ================================
+
+##================================ by Transect ================================
 
 #' [Test code]
 # path = read_excel("_stats_outputs/fit_data.xlsx")
@@ -249,10 +251,10 @@ overall_transect_stats = function(path){
   return(mms_overall_change)
 }
 
-#================================ Overall Stats by Slope Pose ================================
+##================================ by Slope Pos ================================
 
 #' [Test code]
-# path = read_excel("_stats_outputs/fit_data.xlsx")
+# path = "_stats_outputs/fit_data.xlsx"
 
 overall_slopepost_stats = function(path){
   
@@ -260,38 +262,66 @@ overall_slopepost_stats = function(path){
   measurements = read_excel(path)
   
   # Simplify measurement data to have have only the overall elevation change at each pin
-  # and do a basic one-sample t-test to determine significance.
+  # plus the baseline to fit a linear model testing BS significance and whether FS is
+  # significantly different than BS.
+  
+  # Select data 
   mms_overall_change = measurements %>% 
     group_by(forest, slope_pos) %>% 
     filter(date == max(date) |
-             date == min(date)) %>% # Select only last measurement
-    ungroup() %>% 
-    
-    # Fit linear models to get mean change of each 'array' (each forest, slope_pos, 
-    # transect combo) with summary statistics.
-    group_by(forest, slope_pos) %>% 
-    summarise(
-      
-      # Fit a linear model
-      mean = as.numeric(tidy(lm(mm ~ date * slope_pos - 1))["estimate"]),
-      #std_error = as.numeric(tidy(lm(mm - 0 ~ 1))["std.error"]),
-      #p_value = as.numeric(tidy(lm(mm - 0 ~ 1))["p.value"]),
-      .groups = "drop"
-    ) %>% 
+             #date == min(date)) %>%  # Last and first measurement 
+             date == sort(unique(date))[2]) %>%  # Last and second measurement
     ungroup()
   
-  tidy(lm(data = mms_overall_change, mm ~ date * slope_pos - 1))
+  
+  # Create a list of forests in the dataset
+  forest_list = unique(mms_overall_change$forest)
+  
+  # Create a df to hold coefs
+  nforest = rep(NA, times = length(forest_list))
+  mms_slope_pos = data.frame(forest = nforest,
+                             estiamte_bs = nforest,
+                             stderror_bs = nforest,
+                             pval_bs = nforest,
+                             estiamte_fs = nforest,
+                             stderror_fs = nforest,
+                             pval_fs = nforest,
+                             pval_interaction = nforest)
+  
+  i = 1
+  # For loop to fit a lm for each forest: estimate ~ date * slope_pos - 1
+  for(i in 1:length(forest_list)){
+    # Filter overall dataset for only forest i data
+    data = mms_overall_change %>% 
+      filter(forest == forest_list[i])
+    
+    # Fit model. This lm uses effects coding to produce an estimate representing
+    # the mean change from baseline to final measurement for FS and BS 
+    # independently. The p.value for the 
+    lm = lm(data = data, mm ~ date * slope_pos - 1) # effects coding for model, add "- dayof"
+    
+    # Build data frame using model outputs
+    mms_slope_pos[i,"forest"] = forest_list[i] # Forest column
+    mms_slope_pos[i,"forest"]
+    
+    tidy(lm)[2, "estimate"]
+  }
+  
   
   #lm(data = pin.list[[i]], mm ~ dayof * slope_pos - 1)
   
   return(mms_overall_change)
 }
 
-#================================ Slope Position Units ================================
+
+
+#================================ Converting Units ================================
 
 
 
-#================================ Frame mms ================================
+#================================ Building Tables ================================
+
+##================================ Create Datefarme ================================
 
 #' [Test code]
 # data = read_xlsx("_stats_outputs/fit_data.xlsx")
@@ -332,7 +362,7 @@ frame_mmdt = function(path){
 
 
 
-#================================ Pub Table mms ================================
+##================================ Make Flextable ================================
 
 #' [Test code]
 # frame = tar_read(mms_frame)

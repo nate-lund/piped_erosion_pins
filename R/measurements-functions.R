@@ -142,7 +142,7 @@ differenced_QAQC = function(data3) {
 #================================ Fit lsplines to MMs ================================
 
 #' [Test code]
-#data4 = difference_pins(data_cleanup(pull_measurements("C:/Users/natha/Box/_data/_erosion_pins/ARB-LR_raw.xlsx", "2025")))
+# data4 = difference_pins(data_cleanup(pull_measurements("C:/Users/natha/Box/_data/_erosion_pins/ARB-LR_raw.xlsx", "2025")))
 
 
 fit_lspines = function(data4){
@@ -218,6 +218,77 @@ fit_lspines = function(data4){
   
   return(path)
 }
+
+#================================ Overall Stats by Transect ================================
+
+#' [Test code]
+# path = read_excel("_stats_outputs/fit_data.xlsx")
+
+overall_transect_stats = function(path){
+  
+  measurements = read_excel(path)
+  
+  # Simplify measurement data to have have only the overall elevation change at each pin
+  # and do a basic one-sample t-test to determine significance.
+  mms_overall_change = measurements %>% 
+    group_by(index) %>% 
+    filter(date == max(date)) %>% # Select only last measurement
+    ungroup() %>% 
+    
+    # Fit linear models to get mean change of each 'array' (each forest, slope_pos, 
+    # transect combo) with summary statistics.
+    group_by(forest, slope_pos, transect) %>% 
+    summarise(
+      mean = as.numeric(tidy(lm(mm - 0 ~ 1))["estimate"]),
+      std_error = as.numeric(tidy(lm(mm - 0 ~ 1))["std.error"]),
+      p_value = as.numeric(tidy(lm(mm - 0 ~ 1))["p.value"]),
+      .groups = "drop"
+    ) %>% 
+    ungroup()
+  
+  return(mms_overall_change)
+}
+
+#================================ Overall Stats by Slope Pose ================================
+
+#' [Test code]
+# path = read_excel("_stats_outputs/fit_data.xlsx")
+
+overall_slopepost_stats = function(path){
+  
+  # Pull data from /_stats_outputs
+  measurements = read_excel(path)
+  
+  # Simplify measurement data to have have only the overall elevation change at each pin
+  # and do a basic one-sample t-test to determine significance.
+  mms_overall_change = measurements %>% 
+    group_by(forest, slope_pos) %>% 
+    filter(date == max(date) |
+             date == min(date)) %>% # Select only last measurement
+    ungroup() %>% 
+    
+    # Fit linear models to get mean change of each 'array' (each forest, slope_pos, 
+    # transect combo) with summary statistics.
+    group_by(forest, slope_pos) %>% 
+    summarise(
+      
+      # Fit a linear model
+      mean = as.numeric(tidy(lm(mm ~ date * slope_pos - 1))["estimate"]),
+      #std_error = as.numeric(tidy(lm(mm - 0 ~ 1))["std.error"]),
+      #p_value = as.numeric(tidy(lm(mm - 0 ~ 1))["p.value"]),
+      .groups = "drop"
+    ) %>% 
+    ungroup()
+  
+  tidy(lm(data = mms_overall_change, mm ~ date * slope_pos - 1))
+  
+  #lm(data = pin.list[[i]], mm ~ dayof * slope_pos - 1)
+  
+  return(mms_overall_change)
+}
+
+#================================ Slope Position Units ================================
+
 
 
 #================================ Frame mms ================================

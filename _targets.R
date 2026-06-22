@@ -75,13 +75,20 @@ list(
   ## Fil lslpines to pins ====
   tar_target(
     lsplines,
-    fit_lspines(differenced_pins)
+    fit_lspines(differenced_pins),
+    format = "file"
   ),
   
   ## Plot mms over time for each forests ====
   tar_target(
     plot_mmdt,
     plot_mm_dt(lsplines)
+  ),
+  
+  ## Compute overall change stats ====
+  tar_target(
+    mms_overall_change,
+    overall_stats(lsplines)
   ),
   
   ## Make df for mms over time ====
@@ -123,7 +130,7 @@ list(
   ## Plots rasters and point data together, unique plot for each forest ====
   tar_target(
     indv_plots,
-    plot_each(points_mms, cdfs),
+    plot_each(points_plus_mms, cdfs),
     pattern = map(cdfs),
     iteration = "list"
   ),
@@ -136,14 +143,14 @@ list(
   
   ## Combine point (GPS) data and measurement data ====
   tar_target(
-    points_mms,
-    combo(points, differenced_pins)
+    points_plus_mms,
+    left_join(mms_overall_change, points, by = c("forest", "transect", "slope_pos"))
   ),
   
   ## Extract slope at each point ====
   tar_target(
     slope_extracted,
-    extract_slope(points_mms, cdfs),
+    extract_slope(points_plus_mms, cdfs),
     pattern = map(cdfs)
   ),
   
@@ -154,10 +161,17 @@ list(
   )
   
   )
-  
+
+#================================ Something ================================  
+
+# tar_mainfest()
+
 # tar_visnetwork()
 
 # tar_make()
+
+# Clear _targets/objects
+# tar_destroy(destroy = c("objects"))
 
 # tar_meta(fields = error, complete_only = TRUE)
 

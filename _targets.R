@@ -1,8 +1,5 @@
 #================================ Packages ================================
 
-# Clear environment
-rm(list = ls(all.names = TRUE))
-
 # libraries needed
 libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont")
 
@@ -85,11 +82,24 @@ list(
     plot_mm_dt(lsplines)
   ),
   
-  ## Compute overall change stats ====
+  ## Compute overall rate of change by transect ====
   tar_target(
-    mms_overall_change,
-    overall_stats(lsplines)
+    transect_roc,
+    roc_transect_stats(lsplines)
   ),
+  
+  ## Compute overall rate of change by transect ====
+  tar_target(
+    transect_overall,
+    overall_transect_stats(lsplines)
+  ),
+  
+  ## Compute overall rate of change by slope_pos ====
+  tar_target(
+    slope_pos_roc,
+    roc_slopepos_stats(lsplines)
+  ),
+  
   
   ## Make df for mms over time ====
   tar_target(
@@ -144,7 +154,7 @@ list(
   ## Combine point (GPS) data and measurement data ====
   tar_target(
     points_plus_mms,
-    left_join(mms_overall_change, points, by = c("forest", "transect", "slope_pos"))
+    left_join(transect_overall, points, by = c("forest", "transect", "slope_pos"))
   ),
   
   ## Extract slope at each point ====
@@ -164,7 +174,7 @@ list(
 
 #================================ Something ================================  
 
-# tar_mainfest()
+# tar_manifest()
 
 # tar_visnetwork()
 

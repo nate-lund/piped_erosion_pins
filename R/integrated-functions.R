@@ -39,7 +39,7 @@ plot_each = function(points, cdfs) {
   # Create plot
   ggplot = ggplot() +
     geom_raster(data = rast_df, aes(x = x, y = y, fill = slope)) +
-    geom_sf(data = pts_sf, aes(color = mean, shape = signif), size = 4) +
+    geom_sf(data = pts_sf, aes(color = estimate, shape = signif), size = 4) +
     
     # Slope/DEM colors
     scale_fill_gradient2(

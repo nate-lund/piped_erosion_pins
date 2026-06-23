@@ -221,27 +221,29 @@ fit_lspines = function(data4){
 
 #================================ Summary Stats ================================
 
-##================================ by Transect ================================
+##================================ Cumulative by Transect ================================
 
 #' [Test code]
-# path = read_excel("_stats_outputs/fit_data.xlsx")
+# path = "_stats_outputs/fit_data.xlsx"
 
 overall_transect_stats = function(path){
   
   measurements = read_excel(path)
   
-  # Simplify measurement data to have have only the overall elevation change at each pin
-  # and do a basic one-sample t-test to determine significance.
+  # Simplify measurement data to have have only the overall elevation change at 
+  # each pin plus the second or first measurement
   mms_overall_change = measurements %>% 
-    group_by(index) %>% 
-    filter(date == max(date)) %>% # Select only last measurement
+    group_by(forest, slope_pos) %>% 
+    filter(date == max(date) |
+             date == min(date)) %>%  # Last and first measurement 
+             #date == sort(unique(date))[2]) %>%  # Last and second measurement
     ungroup() %>% 
-    
+  
     # Fit linear models to get mean change of each 'array' (each forest, slope_pos, 
     # transect combo) with summary statistics.
     group_by(forest, slope_pos, transect) %>% 
     summarise(
-      mean = as.numeric(tidy(lm(mm - 0 ~ 1))["estimate"]),
+      estimate = as.numeric(tidy(lm(mm - 0 ~ 1))["estimate"]),
       std_error = as.numeric(tidy(lm(mm - 0 ~ 1))["std.error"]),
       p_value = as.numeric(tidy(lm(mm - 0 ~ 1))["p.value"]),
       .groups = "drop"
@@ -251,26 +253,99 @@ overall_transect_stats = function(path){
   return(mms_overall_change)
 }
 
-##================================ by Slope Pos ================================
+
+##================================ ROC by Transect ================================
 
 #' [Test code]
 # path = "_stats_outputs/fit_data.xlsx"
 
-overall_slopepost_stats = function(path){
+roc_transect_stats = function(path){
+  
+  measurements = read_excel(path)
+  
+  
+  # Simplify measurement data to have have only the overall elevation change at 
+  # each pin plus the second measurement
+  mms_overall_change = measurements %>% 
+    group_by(forest, slope_pos) %>% 
+    filter(date == max(date) |
+             date == min(date)) %>%  # Last and first measurement 
+             #date == sort(unique(date))[2]) %>%  # Last and second measurement
+    ungroup()
+  
+  # Create a list of forests in the data set
+  forest_list = unique(mms_overall_change$forest)
+  
+  # Run for loop to fit a lm for each forest that fits a linear model testing 
+  # BS significance and whether FS is
+  # significantly different than BS.
+  
+  # First loop filters by forest
+  for(i in 1:length(forest_list)){
+    # Filter overall dataset for only forest i data
+    data = mms_overall_change %>% 
+      filter(forest == forest_list[i])
+    
+    # Fit model using effects coding to produce a BS estimate representing
+    # the mean change from baseline to final measurement and an FS estimate 
+    # representing the change from the BS, also reflected in p values.
+    lm = lm(data = data, mm ~ date * slope_pos * transect - date) # effects coding for model, add "- dayof"
+    
+    # Create a df from the tibble model summary ouput
+    df = tidy(lm) %>% 
+      # Rename key columns
+      rename(
+        std_error = std.error,
+        p_value = p.value
+      ) %>% 
+      # Pull from the term our wanted columns 
+      mutate(
+        forest = forest_list[i],
+        slope_pos = case_when(
+          grepl("BS", term) ~ "BS",
+          grepl("FS", term) ~ "FS",
+          TRUE ~ "BS"
+        ),
+        transect = case_when(
+          grepl("north", term) ~ "north",
+          grepl("south", term) ~ "south",
+          grepl("east", term) ~ "east",
+          grepl("west", term) ~ "west",
+          TRUE ~ "central"
+        )
+      ) %>% 
+      # Keep only slopes, not intercepts
+      filter(grepl("date", term)) %>% 
+      # Reorder columns
+      select(forest, transect, slope_pos, estimate, std_error, p_value)
+      
+    mms_transect <- if (i == 1) df else bind_rows(mms_transect, df)
+    
+  }
+  
+  mms_transect %>% mutate(a = estimate * 90)
+  
+  
+  return(mms_transect)
+}
+
+##================================ ROC by Slope Pos ================================
+
+#' [Test code]
+# path = "_stats_outputs/fit_data.xlsx"
+
+roc_slopepos_stats = function(path){
   
   # Pull data from /_stats_outputs
   measurements = read_excel(path)
   
-  # Simplify measurement data to have have only the overall elevation change at each pin
-  # plus the baseline to fit a linear model testing BS significance and whether FS is
-  # significantly different than BS.
-  
-  # Select data 
+  # Simplify measurement data to have have only the overall elevation change at 
+  # each pin plus the second measurement
   mms_overall_change = measurements %>% 
     group_by(forest, slope_pos) %>% 
     filter(date == max(date) |
-             #date == min(date)) %>%  # Last and first measurement 
-             date == sort(unique(date))[2]) %>%  # Last and second measurement
+             date == min(date)) %>%  # Last and first measurement 
+             #date == sort(unique(date))[2]) %>%  # Last and second measurement
     ungroup()
   
   
@@ -281,36 +356,43 @@ overall_slopepost_stats = function(path){
   nforest = rep(NA, times = length(forest_list))
   mms_slope_pos = data.frame(forest = nforest,
                              estiamte_bs = nforest,
-                             stderror_bs = nforest,
-                             pval_bs = nforest,
+                             std_error_bs = nforest,
+                             p_value_bs = nforest,
                              estiamte_fs = nforest,
-                             stderror_fs = nforest,
-                             pval_fs = nforest,
-                             pval_interaction = nforest)
+                             std_error_fs = nforest,
+                             p_value_int = nforest) # Not the sig of FS, but diff
   
-  i = 1
+
   # For loop to fit a lm for each forest: estimate ~ date * slope_pos - 1
+  # Fit a linear model testing BS significance and whether FS is
+  # significantly different than BS.
   for(i in 1:length(forest_list)){
     # Filter overall dataset for only forest i data
     data = mms_overall_change %>% 
       filter(forest == forest_list[i])
     
-    # Fit model. This lm uses effects coding to produce an estimate representing
-    # the mean change from baseline to final measurement for FS and BS 
-    # independently. The p.value for the 
-    lm = lm(data = data, mm ~ date * slope_pos - 1) # effects coding for model, add "- dayof"
+    # Fit model using effects coding to produce a BS estimate representing
+    # the mean change from baseline to final measurement and an FS estimate 
+    # representing the change from the BS, also reflected in p values.
+    lm = lm(data = data, mm ~ date * slope_pos) # effects coding for model, add "- dayof"
     
     # Build data frame using model outputs
     mms_slope_pos[i,"forest"] = forest_list[i] # Forest column
-    mms_slope_pos[i,"forest"]
     
-    tidy(lm)[2, "estimate"]
+    # Backslope coefs
+    mms_slope_pos[i, "estiamte_bs"] = tidy(lm)[2, "estimate"]
+    mms_slope_pos[i, "stderror_bs"] = tidy(lm)[2, "std.error"]
+    mms_slope_pos[i, "pvalue_bs"] = tidy(lm)[2, "p.value"]
+    
+    # Footslope coefs
+    mms_slope_pos[i, "estiamte_fs"] = tidy(lm)[2, "estimate"] + tidy(lm)[4, "estimate"]
+    mms_slope_pos[i, "stderror_fs"] = tidy(lm)[4, "std.error"]
+    mms_slope_pos[i, "int_pvalue_fs"] = tidy(lm)[4, "p.value"]
+    
+
   }
   
-  
-  #lm(data = pin.list[[i]], mm ~ dayof * slope_pos - 1)
-  
-  return(mms_overall_change)
+  return(mms_slope_pos)
 }
 
 

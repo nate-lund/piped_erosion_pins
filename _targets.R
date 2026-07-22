@@ -45,63 +45,70 @@ tar_source(
 
 # Replace the target list below with your own:
 list(
-  ## Pull erosion pin measurement data ====
+  
+  ## Measurement Functions ====
+  ### Pull erosion pin measurement data ====
   tar_target(
     raw_measurements,
     pull_measurements("C:/Users/natha/Box/_data/_erosion_pins/ARB-LR_raw.xlsx", "2025")
   ),
   
-  ## Clean up erosion pin data ====
+  ### Clean up erosion pin data ====
   tar_target(
     clean_data,
     data_cleanup(raw_measurements)
   ),
   
-  ## Difference erosion pins ====
+  ### Difference erosion pins ====
   tar_target(
     differenced_pins,
     difference_pins(clean_data)
   ),
   
-  ## QAQC Measurement data ====
+  ### QAQC Measurement data ====
   tar_target(
     QAQC,
     differenced_QAQC(differenced_pins)
   ),
   
-  ## Fil lslpines to pins ====
+  ### Fil lslpines to pins ====
   tar_target(
     lsplines,
     fit_lspines(differenced_pins),
     format = "file"
   ),
   
-  ## Plot mms over time for each forests ====
+  ### Plot mms over time for each forests ====
   tar_target(
     plot_mmdt,
     plot_mm_dt(lsplines)
   ),
   
-  ## Compute overall rate of change by transect ====
+  ### Compute overall rate of change (mm/day) by transect ====
   tar_target(
     transect_roc,
     roc_transect_stats(lsplines)
   ),
   
-  ## Compute overall rate of change by transect ====
+  ### Compute overall change (mm) by transect ====
   tar_target(
     transect_overall,
     overall_transect_stats(lsplines)
   ),
   
-  ## Compute overall rate of change by slope_pos ====
+  ### Compute overall rate of change (mm/day) by slope_pos ====
   tar_target(
     slope_pos_roc,
     roc_slopepos_stats(lsplines)
   ),
   
+  ### Compute back of envelope unit compuitations using Baumann et al. data ====
+  tar_target(
+    baumann_bd,
+    read_xlsx("C:/Users/natha/Box/_data/_outside_data/Baumenn-et-al_BD-values.xlsx")
+  ),
   
-  ## Make df for mms over time ====
+  ### Make df for mms over time ====
   tar_target(
     mms_frame,
     frame_mmdt(lsplines)
@@ -113,31 +120,32 @@ list(
   #   table_mmdt(mms_df)
   # ),
   
-  ## Locate GPS locations based on file path ====
+  ## Spatial Functions ====
+  ### Locate GPS locations based on file path ====
   tar_target(
     name = find_data,
     "C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv"
   ),
   
-  ## Import CSV into R ====
+  ### Import CSV into R ====
   tar_target(
     name = points,
     command = get_points(find_data)
   ),
   
-  ## Pull DEMs from OpenTopography API. Export as netCDF files ====
+  ### Pull DEMs from OpenTopography API. Export as netCDF files ====
   tar_target(
     cdf_paths,
     pull_dems(points)
   ),
   
-  ## Tracks the actual files on disk, branches over them ====
+  ### Tracks the actual files on disk, branches over them ====
   tar_files( # This facilitates branching which is needed for the next step 
     cdfs,
     cdf_paths
   ),
   
-  ## Plots rasters and point data together, unique plot for each forest ====
+  ### Plots rasters and point data together, unique plot for each forest ====
   tar_target(
     indv_plots,
     plot_each(points_plus_mms, cdfs),
@@ -145,26 +153,27 @@ list(
     iteration = "list"
   ),
   
-  ## Put dem/point plots in a list ====
+  ### Put dem/point plots in a list ====
   tar_target(
     all_plots,
     plot_all(indv_plots)
   ),
   
-  ## Combine point (GPS) data and measurement data ====
+  ## Intergrated Function ====
+  ### Combine point (GPS) data and measurement data ====
   tar_target(
     points_plus_mms,
     left_join(transect_overall, points, by = c("forest", "transect", "slope_pos"))
   ),
   
-  ## Extract slope at each point ====
+  ### Extract slope at each point ====
   tar_target(
     slope_extracted,
     extract_slope(points_plus_mms, cdfs),
     pattern = map(cdfs)
   ),
   
-  ## Combine all branches into one dataframe ====
+  ### Combine all branches into one dataframe ====
   tar_target(
     points_mms_slope,
     bind_rows(slope_extracted)
@@ -186,3 +195,5 @@ list(
 # tar_meta(fields = error, complete_only = TRUE)
 
 # tar_read(all_plots)
+
+# tar_read(plot_mmdt)

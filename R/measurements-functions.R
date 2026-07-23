@@ -467,8 +467,7 @@ convert_units = function(slope_pos_roc, bd){
   
   # Define a function to propogate SE
   propogate_error = function(x, dx, y, dy, z){
-    #dz = ((x * y) + (y * dx) + (dy * x) + (dy * dx))/z
-    
+   
     dz = sqrt((dx / x)^2 + (dy / y)^2) * abs(z)
     
     return(dz)
@@ -478,19 +477,19 @@ convert_units = function(slope_pos_roc, bd){
   erosion_totals = erosion_bd %>% 
   
     mutate(
-      # Compute erosion in metric tons/hectare
-      tons_hectare = estimate / 10 # Convert to cm
+      # Compute erosion in metric tons/km2
+      tons_km2 = estimate / 10 # Convert to cm
       * bd_mean # Compute in g/cm2,
-      * 100, # Convert to t/ha
+      * 10000, # Convert to t/km2
       # Compute SE
-      tons_hectare_se = propogate_error(estimate, std_error, bd_mean, bd_se, tons_hectare),
+      tons_km2_se = propogate_error(estimate, std_error, bd_mean, bd_se, tons_km2),
     
       
       # Compute erosion in imperial ton/acre
-      tons_acre = tons_hectare / 2.47105 * 0.984207,  # Convert to cm
+      tons_acre = tons_km2 / 2.47105 * 0.984207 / 100,
       
         # Compute SE
-      tons_acre_se = tons_hectare_se / 2.47105 * 0.984207,
+      tons_acre_se = tons_km2_se / 2.47105 * 0.984207 / 100,
       
            )
   
@@ -671,11 +670,11 @@ table_mmdt = function(frame){
     
     
     # Color erosion values
-    color(~ estimate_slope.1 < 0, color = "red2", j = "estimate_slope.1") %>% 
-    color(~ estimate_slope.2 < 0, color = "red2", j = "estimate_slope.2") %>% 
-    color(~ estimate_slope.3 < 0, color = "red2", j = "estimate_slope.3") %>% 
-    color(~ estimate_slope.4 < 0, color = "red2", j = "estimate_slope.4") %>% 
-    color(~ estimate_slope.5 < 0, color = "red2", j = "estimate_slope.5") %>% 
+    color(~ estimate_slope.1 < 0, color = "red", j = "estimate_slope.1") %>% 
+    color(~ estimate_slope.2 < 0, color = "red", j = "estimate_slope.2") %>% 
+    color(~ estimate_slope.3 < 0, color = "red", j = "estimate_slope.3") %>% 
+    color(~ estimate_slope.4 < 0, color = "red", j = "estimate_slope.4") %>% 
+    color(~ estimate_slope.5 < 0, color = "red", j = "estimate_slope.5") %>% 
     
     add_header_row(values = c("",
                               "Period 1",
@@ -734,8 +733,8 @@ table_erosion_totals = function(path){
       bd_mean = signif(bd_mean, digits = 3),
       bd_se = signif(bd_se, digits = 3),
       
-      tons_hectare = signif(tons_hectare, digits = 3),
-      tons_hectare_se = signif(tons_hectare_se, digits = 3),
+      tons_km2 = signif(tons_km2, digits = 3),
+      tons_km2_se = signif(tons_km2_se, digits = 3),
       
       tons_acre = signif(tons_acre, digits = 3),
       tons_acre_se = signif(tons_acre_se, digits = 3)
@@ -766,8 +765,8 @@ table_erosion_totals = function(path){
     
   
   # Define a border, needed in table
-  box_cols <- c("estimate", "tons_hectare", "tons_acre")
-  outline_border <- fp_border(color = "firebrick3", width = 1.5)   
+  box_cols <- c("estimate", "tons_km2", "tons_acre")
+  outline_border <- fp_border(color = "red", width = 1.5)   
   
   # Build flextable
   erosion_units_ft = flextable(df, 
@@ -783,8 +782,8 @@ table_erosion_totals = function(path){
                                             #"worms",
                                             #"bd_mean",
                                             #"bd_se",
-                                            "tons_hectare",
-                                            "tons_hectare_se",
+                                            "tons_km2",
+                                            "tons_km2_se",
                                             "blank3",
                                             "tons_acre",
                                             "tons_acre_se")
@@ -811,8 +810,8 @@ table_erosion_totals = function(path){
                 #"worms",
                 #"bd_mean",
                 #"bd_se",
-                "tons_hectare",
-                "tons_hectare_se",
+                "tons_km2",
+                "tons_km2_se",
                 "tons_acre",
                 "tons_acre_se"), width = 1) %>% 
     
@@ -821,7 +820,7 @@ table_erosion_totals = function(path){
     add_header_row(values = c("",
                               "Δ Elevation (mm)",
                               #"Bulk Desnity (g/cm³)",
-                              "Tonnes/hectare",
+                              "Tonnes/km2",
                               "Tons/acre"),
                    colwidths = c(4, # adds up to total number of cols
                                  4,
@@ -840,10 +839,10 @@ table_erosion_totals = function(path){
     ) %>% 
     
     mk_par(
-      j = "tons_hectare",
+      j = "tons_km2",
       value = as_paragraph(
-        as_chunk(formatC(tons_hectare, format = "f", digits = 2)),
-        as_chunk(" t/ha", props = fp_text(color = "grey50", font.size = 8)),
+        as_chunk(formatC(tons_km2, format = "f", digits = 0)),
+        as_chunk(" t/km²", props = fp_text(color = "grey50", font.size = 8)),
         as_chunk(ifelse(p_value < 0.05, "*", ""))
       )
     ) %>% 
@@ -879,12 +878,12 @@ table_erosion_totals = function(path){
     
     
     # Change widths of SE
-    width(j = c("std_error", "tons_hectare_se", "tons_acre_se", "p_value"), width = 0.9) %>% 
-    align(j = c("std_error", "tons_hectare_se", "tons_acre_se", "p_value"), align = "center", part = "all") %>% 
+    width(j = c("std_error", "tons_km2_se", "tons_acre_se", "p_value"), width = 0.9) %>% 
+    align(j = c("std_error", "tons_km2_se", "tons_acre_se", "p_value"), align = "center", part = "all") %>% 
     
     
     # Edit width of estimates
-    width(j = c("estimate", "tons_hectare", "tons_acre"), width = 1.2) %>% 
+    width(j = c("estimate", "tons_km2", "tons_acre"), width = 1.2) %>% 
     
     
     # Create and rotate worms column
@@ -928,8 +927,8 @@ table_erosion_totals = function(path){
                  "estimate" = "Estimate",
                  "std_error" = "SE",
                  "p_value" = "p-value",
-                 "tons_hectare" = "Estimate",
-                 "tons_hectare_se" = "SE",
+                 "tons_km2" = "Estimate",
+                 "tons_km2_se" = "SE",
                  "tons_acre" = "Estimate",
                  "tons_acre_se" = "SE"
       ))
@@ -942,9 +941,6 @@ table_erosion_totals = function(path){
   path2 = "_plot_outputs/erosion_totals.png"
   save_as_image(erosion_units_ft, path = path2)
 
-  # Notes for this table
-  # The p-value for the foot slope positions indicates significant difference from 
-  # its corresponding BS estimate. 
   
   }
 

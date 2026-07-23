@@ -1,7 +1,7 @@
 #================================ Packages ================================
 
 # libraries needed
-libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont")
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite")
 
 # install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -102,10 +102,23 @@ list(
     roc_slopepos_stats(lsplines)
   ),
   
-  ### Compute back of envelope unit compuitations using Baumann et al. data ====
+  ### Pull Baumann et al. 2025 data ====
   tar_target(
     baumann_bd,
     read_xlsx("C:/Users/natha/Box/_data/_outside_data/Baumenn-et-al_BD-values.xlsx")
+  ),
+  
+  ### Compute back of envelope unit computations using Baumann et al. data ====
+  tar_target(
+    erosion_totals_units,
+    convert_units(slope_pos_roc, baumann_bd),
+    format = "file" # Saved as an .xlxs, so need this.
+  ),
+  
+  ### Make flextable erosion totals ====
+  tar_target(
+    erosion_totals_ft,
+    table_erosion_totals(erosion_totals_units)
   ),
   
   ### Make df for mms over time ====

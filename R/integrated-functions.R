@@ -113,9 +113,11 @@ plot_all = function(plots){
   
   # Strip legends and axis lables from plots
   plots_stipped = lapply(plots, function(p) p + theme(legend.position = "none") +
-                           theme(axis.text = element_blank(),
-                                 axis.ticks = element_blank(),
-                                 axis.title = element_blank()))
+                           theme(#axis.text = element_blank(),
+                           #       axis.ticks = element_blank(),
+                                  axis.title = element_blank()
+                           )
+                           )
   
   
   # Pull legend from a plot

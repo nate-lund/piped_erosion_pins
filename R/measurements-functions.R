@@ -417,7 +417,7 @@ roc_slopepos_stats = function(path){
 
 
 
-#================================ Back of the Envelope ================================
+#================================ Erosion Totals (Units) ================================
 
 #' [Test Code]
 # slope_pos_roc = tar_read(slope_pos_roc); baumann_bd = tar_read(baumann_bd)
@@ -426,7 +426,7 @@ convert_units = function(slope_pos_roc, bd){
   
   # Compute a mean of the bd for the top 5cm, relevant to erosion, for each
   # earthworm species
-  baumann_df <- baumann_bd %>% 
+  baumann_df <- bd %>% 
     filter(Depth_cm == "0-5") %>% # Only top 5cm  
     
     # Standardize worms
@@ -467,13 +467,15 @@ convert_units = function(slope_pos_roc, bd){
   
   # Define a function to propogate SE
   propogate_error = function(x, dx, y, dy, z){
-    dz = ((x * y) + (y * dx) + (dy * x) + (dy * dx))/z
+    #dz = ((x * y) + (y * dx) + (dy * x) + (dy * dx))/z
+    
+    dz = sqrt((dx / x)^2 + (dy / y)^2) * abs(z)
     
     return(dz)
   }
   
-  # Compute erosion rates, propogate standard error (assuming no covariance) 
-  erosion_bd %>% 
+  # Compute erosion rates, propagate standard error (assuming no covariance) 
+  erosion_totals = erosion_bd %>% 
   
     mutate(
       # Compute erosion in metric tons/hectare
@@ -492,20 +494,24 @@ convert_units = function(slope_pos_roc, bd){
       
            )
   
-  
+  # Write to _stats_output
+  path = "_stats_outputs/erosion_totals.xlsx"
+  write_xlsx(erosion_totals, path)
+   
+  return(path)
   
 }
 
 #================================ Building Tables ================================
 
-##================================ Create Datefarme ================================
+##================================ Create DF for mms/dt ================================
 
 #' [Test code]
 # data = read_xlsx("_stats_outputs/fit_data.xlsx")
 
 frame_mmdt = function(path){
   
-  data = read_xlsx(path)
+  data = read_excel(path)
   
   # Build table of raw data
   table_data <- data %>%
@@ -539,7 +545,7 @@ frame_mmdt = function(path){
 
 
 
-##================================ Make Flextable ================================
+##================================ Make Flextable for mms/dt ================================
 
 #' [Test code]
 # frame = tar_read(mms_frame)
@@ -710,6 +716,238 @@ table_mmdt = function(frame){
 }
 
 
+##================================ Make Flextable for Erosion Totals ================================
+
+#' [Test Code]
+# path = tar_read(erosion_totals_units)
+
+table_erosion_totals = function(path){
+  
+  data = read_excel("_stats_outputs/erosion_totals.xlsx")
+
+    # Do some cleanup
+  df = data %>% 
+    # Round values
+    mutate(
+      estimate = round(estimate, digits = 2),
+      std_error = round(std_error, digits = 2),
+      bd_mean = signif(bd_mean, digits = 3),
+      bd_se = signif(bd_se, digits = 3),
+      
+      tons_hectare = signif(tons_hectare, digits = 3),
+      tons_hectare_se = signif(tons_hectare_se, digits = 3),
+      
+      tons_acre = signif(tons_acre, digits = 3),
+      tons_acre_se = signif(tons_acre_se, digits = 3)
+    ) %>% 
+    
+    # Change case
+    mutate(type = case_when(
+      type == "bs" ~ "BS",
+      type == "fs" ~ "FS"
+    )) %>% 
+    
+    # Update worms
+    mutate(worms = case_when(
+      worms == "JW" ~ "Jumping worm",
+      worms == "EW" ~ "European worm"
+    )) %>% 
+  
+    
+    # Remove duplicated forest names
+    mutate(forest = as.character(forest)) %>%
+    group_by(forest) %>%
+    mutate(forest_vis = ifelse(row_number() == 1, forest, "")) %>%
+    ungroup() %>% 
+    
+    # Order
+    mutate(forest = factor(forest, levels = c("ASH", "LRW", "LRE", "MAG", "WD", "LRJ"))) %>% 
+    arrange(forest)
+    
+  
+  # Define a border, needed in table
+  box_cols <- c("estimate", "tons_hectare", "tons_acre")
+  outline_border <- fp_border(color = "firebrick3", width = 1.5)   
+  
+  # Build flextable
+  erosion_units_ft = flextable(df, 
+                               col_keys = c("worms",
+                                            "forest",
+                                            #"dt",
+                                            "type",
+                                            "blank1",
+                                            "estimate",
+                                            "std_error",
+                                            "p_value",
+                                            "blank2",
+                                            #"worms",
+                                            #"bd_mean",
+                                            #"bd_se",
+                                            "tons_hectare",
+                                            "tons_hectare_se",
+                                            "blank3",
+                                            "tons_acre",
+                                            "tons_acre_se")
+  ) %>% 
+    empty_blanks() %>%
+    bg(bg = "white", part = "all") %>% 
+    
+    # All
+    font(part = "all", fontname = "Calibri") %>% 
+    fontsize(part = "all", size = 11) %>% 
+    align(align = "right", part = "all") %>%
+    
+    # Header
+    align(align = "center", part = "header") %>%
+    valign(valign = "center", part = "header") %>% 
+    
+    width(j = c("worms",
+                "forest",
+                #"dt",
+                "type",
+                "estimate",
+                "std_error",
+                "p_value",
+                #"worms",
+                #"bd_mean",
+                #"bd_se",
+                "tons_hectare",
+                "tons_hectare_se",
+                "tons_acre",
+                "tons_acre_se"), width = 1) %>% 
+    
+    line_spacing(space = 1.8, part = "header") %>% 
+
+    add_header_row(values = c("",
+                              "Δ Elevation (mm)",
+                              #"Bulk Desnity (g/cm³)",
+                              "Tonnes/hectare",
+                              "Tons/acre"),
+                   colwidths = c(4, # adds up to total number of cols
+                                 4,
+                                 #3,
+                                 3,
+                                 2)) %>% 
+    
+    # * all significant values, add units 
+    mk_par(
+      j = "estimate",
+      value = as_paragraph(
+        as_chunk(formatC(estimate, format = "f", digits = 2)),
+        as_chunk(" mm", props = fp_text(color = "grey50", font.size = 8)),
+        as_chunk(ifelse(p_value < 0.05, "*", ""))
+      )
+    ) %>% 
+    
+    mk_par(
+      j = "tons_hectare",
+      value = as_paragraph(
+        as_chunk(formatC(tons_hectare, format = "f", digits = 2)),
+        as_chunk(" t/ha", props = fp_text(color = "grey50", font.size = 8)),
+        as_chunk(ifelse(p_value < 0.05, "*", ""))
+      )
+    ) %>% 
+    
+    mk_par(
+      j = "tons_acre",
+      value = as_paragraph(
+        as_chunk(formatC(tons_acre, format = "f", digits = 2)),
+        as_chunk(" t/ac", props = fp_text(color = "grey50", font.size = 8)),
+        as_chunk(ifelse(p_value < 0.05, "*", ""))
+      )
+    ) %>%
+    
+    # Format p values in scientific notation
+    set_formatter(p_value = function(x) formatC(x, format = "e", digits = 2)) %>% 
+    
+    
+    # Zebra striping — every other row
+    bg(i = seq(2, nrow(df), by = 2), bg = "grey95", part = "body") %>% 
+    
+    # Divider line where EW transitions to JW
+    hline(i = 6, part = "body", border = fp_border(color = "black", width = 1.5)) %>% 
+    
+    # Merge duplicate forest names
+    merge_v(j = "forest", part = "body") %>% 
+    width(j = "forest", width = 0.75) %>% 
+    align(j = "forest", align = "center", part = "all") %>% 
+    
+    
+    # Clean up slope positions
+    width(j = "type", width = 0.75) %>% 
+    align(j = "type", align = "center", part = "all") %>% 
+    
+    
+    # Change widths of SE
+    width(j = c("std_error", "tons_hectare_se", "tons_acre_se", "p_value"), width = 0.9) %>% 
+    align(j = c("std_error", "tons_hectare_se", "tons_acre_se", "p_value"), align = "center", part = "all") %>% 
+    
+    
+    # Edit width of estimates
+    width(j = c("estimate", "tons_hectare", "tons_acre"), width = 1.2) %>% 
+    
+    
+    # Create and rotate worms column
+    merge_v(j = "worms", part = "body") %>% # Merges worms together 
+    rotate(j = "worms", rotation = "btlr", part = "body") %>% # Rotate text
+    valign(j = "worms", valign = "center", part = "body") %>%
+    align(j = "worms", align = "center", part = "all") %>%
+    width(j = "worms", width = 0.3) %>% 
+    void(j = "worms", part = "header") %>% 
+    
+    #Add boxes around key columns
+    # left/right sides — second header row only
+    border(i = 2, j = box_cols,
+           border.left = outline_border,
+           border.right = outline_border,
+           part = "header") %>%
+    # left/right sides — full body
+    border(j = box_cols,
+           border.left = outline_border,
+           border.right = outline_border,
+           part = "body") %>%
+    # top cap — set on BOTH sides of the row1/row2 boundary
+    border(i = 2, j = box_cols,
+           border.top = outline_border,
+           part = "header") %>%
+    # bottom cap
+    border(i = nrow(df), j = box_cols,
+           border.bottom = outline_border,
+           part = "body") %>% 
+  
+    
+    # # Add units to mm, just a trial
+    # set_formatter(
+    #   estimate  = function(x) paste0(x, " mm", "")
+    #   ) %>% 
+    
+  labelizor(
+      part = "header", 
+      labels = c("forest" = "Forest",
+                 "type" = "Pos.",
+                 "estimate" = "Estimate",
+                 "std_error" = "SE",
+                 "p_value" = "p-value",
+                 "tons_hectare" = "Estimate",
+                 "tons_hectare_se" = "SE",
+                 "tons_acre" = "Estimate",
+                 "tons_acre_se" = "SE"
+      ))
+  
+  erosion_units_ft
+  
+  path = "_plot_outputs/erosion_totals.svg"
+  save_as_image(erosion_units_ft, path = path)
+  
+  path2 = "_plot_outputs/erosion_totals.png"
+  save_as_image(erosion_units_ft, path = path2)
+
+  # Notes for this table
+  # The p-value for the foot slope positions indicates significant difference from 
+  # its corresponding BS estimate. 
+  
+  }
+
 #================================ Plot dmm/dt ================================
 
 #' [Test code]
@@ -770,8 +1008,8 @@ plot_mm_dt = function(path){
     
     scale_linetype_discrete(name = "Slope Position") +
     
+    coord_cartesian(ylim = c(-20, 20)) +
     scale_y_continuous( 
-      limits = c(-20, 20),
       name = "Adjusted Height (mm)") + # May cut off some outliers, fine for visualization
     scale_x_date(limits = c(ymd("2025-07-10"), ymd("2025-10-01")),
                  name = "Date",

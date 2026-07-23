@@ -43,7 +43,7 @@ pull_dems = function(file){
     delta_lat <- 150 / 111320 # Compute lat
     delta_long <- 150 / (111320 * cos(uleft[1] * pi / 180)) # Compute long, correcting for lat
     bright <- c(uleft[1] - delta_lat, uleft[2] + delta_long) # Compute bottom left corner
-  
+    
     # Pull elevation data from Opentopo API
     res <- GET(url = "https://portal.opentopography.org/API/usgsdem",
                query = list(datasetName = "USGS1m",

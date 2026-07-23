@@ -70,17 +70,10 @@ slope_pos_roc|stem|3fa20235630b1fb7|9021c06df9211070|303cd20e9c1dce13|1931267301
 plot_mmdt|stem|cbf14638c69d594c|d5601df21d0c23b7|c50af0366f039d0f|-626711285||t20657.5333460073s|s491728b|491728|rds|local|vector|||3.12|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
 erosion_totals_units|stem|cf14a17dde5053ac|b85a62304068103d|c95c662f1c7e2e33|19133857|_stats_outputs/erosion_totals.xlsx|t20657.5362062841s|s6771b|6771|file|local|vector|||0.08||
 mms_frame|stem|79a0f2d8929604b7|887e944e7e946adc|8c98823530bd8a65|-1626745210||t20657.6447195696s|s1131b|1131|rds|local|vector|||0.08||
-indv_plots_3ec53da55a645a85|branch|2301a9d003c09fd2|94c0f25332d8f045|af93d99e5de5cf5b|-262423925||t20657.6532677725s|s1988190b|1988190|rds|local|list|indv_plots||0.78|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_d85dd1aad079ed34|branch|82e57e27fa696f34|94c0f25332d8f045|d098f0f5ff0a058c|-1899512493||t20657.6532915973s|s2022624b|2022624|rds|local|list|indv_plots||0.7|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_7d0f38ebb2c3231a|branch|ceea0accc9b32dca|94c0f25332d8f045|48f45e4fd1411983|-1590872505||t20657.6533138221s|s2020330b|2020330|rds|local|list|indv_plots||0.61|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_ade62be95181540b|branch|6930735855e3e480|94c0f25332d8f045|7593c9e6e8216912|1071516154||t20657.6533356248s|s2020077b|2020077|rds|local|list|indv_plots||0.53|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_80409a4a775b9eca|branch|48bb4ee54a01ff45|94c0f25332d8f045|1c387e7e02c17d7b|-276787903||t20657.653357054s|s2017929b|2017929|rds|local|list|indv_plots||0.53|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_a9227a4e0becc29a|branch|d6df2027344494e6|94c0f25332d8f045|5fef269294c9868f|913911112||t20657.6533785426s|s2024594b|2024594|rds|local|list|indv_plots||0.52|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots|pattern|eb8c9869990a83c5|94c0f25332d8f045||183193026||||12093744|rds|local|list||indv_plots_3ec53da55a645a85*indv_plots_d85dd1aad079ed34*indv_plots_7d0f38ebb2c3231a*indv_plots_ade62be95181540b*indv_plots_80409a4a775b9eca*indv_plots_a9227a4e0becc29a|3.67||
 erosion_totals_ft|stem|30bf500f6662d5f9|9575051c6928dfe9|17ee7b388f5958bd|1220970016||t20657.6547980361s|s84b|84|rds|local|vector|||3.12||
-libs|object|cd28429fb2bf2a5a
+libs|object|78ca1bf257898942
 extract_slope|function|cbe8d3e2b41b2a39
-plot_each|function|795746b32ae57a7a
+plot_each|function|a4d939ea50d123b6
 convert_units|function|1a30f33541319ff5
 get_points|function|f27b6224f2a4ff2d
 fit_lspines|function|355b76368dc260a8
@@ -88,16 +81,23 @@ overall_transect_stats|function|c8519d1d802e0285
 roc_slopepos_stats|function|9aed14e0583543e2
 table_erosion_totals|function|4775e39938ecb2c5
 pull_dems|function|226d9d46b33a9ace
-.Random.seed|object|99e8d1f9d3728ce8
+.Random.seed|object|ef72c69acb991f78
 data_cleanup|function|d79879436e6511c9
-installed_libs|object|04802fc017bbd3a8
+installed_libs|object|637504588b208d61
 table_mmdt|function|743bf83339967554
-plot_all|function|8073c745369b260c
+plot_all|function|d7cf59c1664aa974
 plot_mm_dt|function|929d8c15a76dd563
 differenced_QAQC|function|f144e471472b7d80
 roc_transect_stats|function|b834f9fe88a38bea
 frame_mmdt|function|f49233ef6e026a83
 pull_measurements|function|59074c5bb72e6d89
 difference_pins|function|e5f261d0445a7192
-cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20657.6560538889s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
-all_plots|stem|5d840506637a8b89|19f8fe7fed37a86f|e31350077f2cb5f7|785210724||t20657.6561700339s|s43b|43|rds|local|vector|||3.98||
+cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20657.7311293037s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
+indv_plots_3ec53da55a645a85|branch|e1f56d7cf3c861ff|94c0f25332d8f045|5338f2bd6a7f0b1b|-262423925||t20657.731154163s|s2029869b|2029869|rds|local|list|indv_plots||0.82|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_d85dd1aad079ed34|branch|4822cb13e2b120d3|94c0f25332d8f045|2af2e281c083919e|-1899512493||t20657.7311766073s|s2060673b|2060673|rds|local|list|indv_plots||0.61|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_7d0f38ebb2c3231a|branch|6033bdefe0ebf470|94c0f25332d8f045|3faaeba23e392c28|-1590872505||t20657.7311976406s|s2055499b|2055499|rds|local|list|indv_plots||0.53|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_ade62be95181540b|branch|675d62cd6bbf7bb9|94c0f25332d8f045|846d8b21a71206b0|1071516154||t20657.7312189776s|s2055108b|2055108|rds|local|list|indv_plots||0.51|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_80409a4a775b9eca|branch|c50d64d6002c1109|94c0f25332d8f045|0766a4149b39753c|-276787903||t20657.7312403174s|s2052035b|2052035|rds|local|list|indv_plots||0.53|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_a9227a4e0becc29a|branch|ab9566ad6bd00607|94c0f25332d8f045|b2ceaa77495f1e6c|913911112||t20657.7312618855s|s2063519b|2063519|rds|local|list|indv_plots||0.53|PROJ: proj_create_from_database: C:\Program Files\TauDEM\share\proj\proj.db contains DATABASE.LAYOUT.VERSION.MINOR = 5 whereas a number >= 6 is expected. It comes from another PROJ installation. (GDAL error 1). [crs<-] Cannot set raster SRS: empty srs. attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots|pattern|5613cc4070b98512|94c0f25332d8f045||183193026||||12316703|rds|local|list||indv_plots_3ec53da55a645a85*indv_plots_d85dd1aad079ed34*indv_plots_7d0f38ebb2c3231a*indv_plots_ade62be95181540b*indv_plots_80409a4a775b9eca*indv_plots_a9227a4e0becc29a|3.53||
+all_plots|stem|5d840506637a8b89|19f8fe7fed37a86f|ae28c22faf19e517|785210724||t20657.7313663991s|s43b|43|rds|local|vector|||2.94||

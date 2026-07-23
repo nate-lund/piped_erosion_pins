@@ -1,9 +1,8 @@
 #================================ Plot Indiv ================================
 
 #' [Test code]
-#points = tar_read(points_mms)
+# points = tar_read(points_plus_mms); cdfs = "C:/Users/natha/Documents/_git-projects/piped_erosion_pins/_topo_outputs/topo-output_MAG.nc"
 
-#cdfs = "C:/Users/natha/Documents/_git-projects/piped_erosion_pins/_topo_outputs/topo-output_MAG.nc"
 
 
 # Define function to plot points and slope raster on same plot. This will be done via 
@@ -35,11 +34,37 @@ plot_each = function(points, cdfs) {
   forest_name = gsub("topo-output_|\\.nc", "", basename(cdfs))
   
   
+  # Establish a bounding box, AKA how much of the DEM we see
+  buffer <- 15  # Same units as CRS (m)
+  bbox <- sf::st_bbox(pts_sf) # Create rectangular bounding box 
   
+  # Center pull the center of the bounding box
+  xmid <- mean(c(bbox["xmin"], bbox["xmax"]))
+  ymid <- mean(c(bbox["ymin"], bbox["ymax"]))
+  
+  # Create a distance from the center based on the longer of the two bounding box dimenstions
+  half_extent <- max(bbox["xmax"] - bbox["xmin"], bbox["ymax"] - bbox["ymin"]) / 2 + buffer
+
   # Create plot
   ggplot = ggplot() +
     geom_raster(data = rast_df, aes(x = x, y = y, fill = slope)) +
-    geom_sf(data = pts_sf, aes(color = estimate, shape = signif), size = 4) +
+    geom_sf(data = pts_sf, aes(color = estimate, shape = signif, size = abs(estimate)), size = 3.5) +
+    
+    # Set extent based on bounding box defined above
+    coord_sf(
+      xlim = c(xmid - half_extent, xmid + half_extent),
+      ylim = c(ymid - half_extent, ymid + half_extent),
+      expand = FALSE
+    ) +
+    
+    # Add a scale bar
+    annotation_scale(
+      location = "bl",
+      width_hint = 0.35, # fraction of plot width the bar spans
+      plot_unit = "m",
+      bar_cols = c("grey40", "grey90"),
+      style = "bar"
+    ) +
     
     # Slope/DEM colors
     scale_fill_gradient2(
@@ -53,16 +78,14 @@ plot_each = function(points, cdfs) {
     ) +
     
     # Shape
-    scale_shape_manual(values = c("Y" = 17, "N" = 18), name = "Signifigance") +
+    scale_shape_manual(values = c("Y" = 19, "N" = 10), name = "Signifigant") +
     
     # Point colors
-    scale_color_gradient2(
-      high = "darkblue",
-      mid = "darkred",
-      low = "red",
-      midpoint = 0,
-      name = "Change (mm)",
-      limits = c(-20, 10)  # Fixed scale across all plots
+    scale_color_gradientn(
+      colours = c("darkmagenta", "red", "orange", "royalblue2"),
+      values = scales::rescale(c(-12, -5, 0, 10)),  # must match limits/data range, scaled to 0-1
+      limits = c(-12, 10),
+      name = "Change (mm)"
     ) +
     
     ggtitle(forest_name) +
@@ -113,9 +136,9 @@ plot_all = function(plots){
   
   # Strip legends and axis lables from plots
   plots_stipped = lapply(plots, function(p) p + theme(legend.position = "none") +
-                           theme(#axis.text = element_blank(),
-                           #       axis.ticks = element_blank(),
-                                  axis.title = element_blank()
+                           theme(axis.text = element_blank(),
+                                axis.ticks = element_blank(),
+                                axis.title = element_blank()
                            )
                            )
   
@@ -128,7 +151,7 @@ plot_all = function(plots){
   grid = plot_grid(plot_panel, legend, rel_widths = c(1.2, 0.15))
   
   # Save plot as file
-  ggsave("_plot_outputs/all_plot.png", grid, width = 8, height = 6)
+  ggsave("_plot_outputs/all_plot.png", grid, width = 9, height = 6)
   
   return()
 }

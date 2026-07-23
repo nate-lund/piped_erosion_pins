@@ -1,7 +1,7 @@
 #================================ Packages ================================
 
 # libraries needed
-libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite")
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial")
 
 # install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -158,6 +158,7 @@ list(
     cdf_paths
   ),
   
+  ## Integrated Functions ====
   ### Plots rasters and point data together, unique plot for each forest ====
   tar_target(
     indv_plots,
@@ -172,7 +173,6 @@ list(
     plot_all(indv_plots)
   ),
   
-  ## Intergrated Function ====
   ### Combine point (GPS) data and measurement data ====
   tar_target(
     points_plus_mms,

@@ -91,6 +91,7 @@ list(
   ),
   
   ### Compute overall change (mm) by transect ====
+  # This is used for plotting
   tar_target(
     transect_overall,
     overall_transect_stats(lsplines)

@@ -976,31 +976,33 @@ plot_mm_dt = function(path){
     # Plot the lines tracking each pin, color by slope position
     geom_line(aes(group = index,
                   color =  slope_pos),
-              linetype = 1) +
+              linetype = 1,
+              alpha = 0.5) +
     
-    # Plot boxplots for each forest and slope position
-    geom_boxplot(aes(group = forest_date,
-                     width = 3,
-                     fill = slope_pos
-                     )) +
+    # # Plot boxplots for each forest and slope position
+    # geom_boxplot(aes(group = forest_date,
+    #                  width = 3,
+    #                  fill = slope_pos
+    #                  ),
+    #              alpha = 1) +
     
     # Plot lspline fits
     geom_line(
       aes(x = date,
           y = predic,
           linetype = slope_pos),
-      linewidth = 1) +
+      linewidth = 0.8) +
     
     
     # Plot a lm over the whole period
     geom_smooth(
       aes(group = slope_pos,
-          color = slope_pos),
-                method = "lm",
-                se = FALSE,
-                fullrange = TRUE,
-                linetype = "dashed",
-                linewidth = 1) +
+          linetype = slope_pos),
+      method = "lm",
+      se = FALSE,
+      fullrange = TRUE,
+      linewidth = 1.2,
+      color = "grey20") +
     
     
     facet_wrap(~forest, ncol = 3) + 
@@ -1045,7 +1047,7 @@ plot_mm_dt = function(path){
     guides(
       color = guide_legend(order = 1),
       fill = guide_legend(order = 1),
-      linetype = guide_legend(order = 1),
+      #linetype = guide_legend(order = 1),
       shape = guide_legend(order = 2)
     )+
     

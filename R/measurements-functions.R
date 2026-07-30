@@ -991,6 +991,18 @@ plot_mm_dt = function(path){
           linetype = slope_pos),
       linewidth = 1) +
     
+    
+    # Plot a lm over the whole period
+    geom_smooth(
+      aes(group = slope_pos,
+          color = slope_pos),
+                method = "lm",
+                se = FALSE,
+                fullrange = TRUE,
+                linetype = "dashed",
+                linewidth = 1) +
+    
+    
     facet_wrap(~forest, ncol = 3) + 
     
     # Visuals

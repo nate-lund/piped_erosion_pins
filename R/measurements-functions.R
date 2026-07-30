@@ -968,6 +968,11 @@ plot_mm_dt = function(path){
   
   ggplot <- ggplot(data = plot_data, mapping = aes(x = date, y = mm)) +
     
+    
+    # Plot reference lines
+    geom_hline(yintercept = c(-35, -10, -5, -1, 0, 1, 5, 10, 35), color = "grey80", linewidth = 0.3) + 
+    geom_hline(yintercept = 0, linewidth = 0.5) + # Plot line at y = 0
+    
     # Plot the lines tracking each pin, color by slope position
     geom_line(aes(group = index,
                   color =  slope_pos),
@@ -976,10 +981,11 @@ plot_mm_dt = function(path){
     # Plot boxplots for each forest and slope position
     geom_boxplot(aes(group = forest_date,
                      width = 3,
-                     fill = slope_pos)) +
+                     fill = slope_pos
+                     )) +
     
     # Plot lspline fits
-    geom_line(#data = plot_data,
+    geom_line(
       aes(x = date,
           y = predic,
           linetype = slope_pos),
@@ -1002,16 +1008,36 @@ plot_mm_dt = function(path){
         "BS" = "indianred2"
       )) +
     
+    # Plot some dummy points - this is just to get outliers in the legend 
+    geom_point(data = data.frame(date = as.Date(NA), mm = NA_real_),
+               aes(x = date, y = mm, shape = "Outliers"),
+               color = "black", na.rm = TRUE) +
+    
+    scale_shape_manual(name = NULL, values = c("Outliers" = 19)) +
+    
     scale_linetype_discrete(name = "Slope Position") +
     
-    coord_cartesian(ylim = c(-20, 20)) +
+    #coord_cartesian(ylim = c(-20, 20)) +   # May cut off some outliers, fine for visualization
+    
     scale_y_continuous( 
-      name = "Adjusted Height (mm)") + # May cut off some outliers, fine for visualization
+      name = "log Height (mm)",
+      trans = scales::pseudo_log_trans(sigma = 1, base = 10),
+      breaks = c(-35, -10, -5, -1, 0, 1, 5, 10, 35)
+      ) +
+    
     scale_x_date(limits = c(ymd("2025-07-10"), ymd("2025-10-01")),
                  name = "Date",
                  date_breaks = "1 month", date_labels = "%b") +
-    geom_hline(yintercept = 0, linewidth = 0.5) +
-    theme(legend.position = "bottom",
+    
+    # Reorder legend
+    guides(
+      color = guide_legend(order = 1),
+      fill = guide_legend(order = 1),
+      linetype = guide_legend(order = 1),
+      shape = guide_legend(order = 2)
+    )+
+    
+    theme(legend.position = "right",
           panel.grid.major.x = element_line(color = "white"),
           panel.grid.major.y = element_blank(),
           panel.grid.minor = element_blank(),

@@ -45,10 +45,17 @@ plot_each = function(points, cdfs) {
   # Create a distance from the center based on the longer of the two bounding box dimenstions
   half_extent <- max(bbox["xmax"] - bbox["xmin"], bbox["ymax"] - bbox["ymin"]) / 2 + buffer
 
+  
+  
+  
+  
   # Create plot
   ggplot = ggplot() +
-    geom_raster(data = rast_df, aes(x = x, y = y, fill = slope)) +
-    geom_sf(data = pts_sf, aes(color = estimate, shape = signif, size = abs(estimate)), size = 3.5) +
+    geom_raster(data = rast_df, aes(x = x, y = y, fill = slope)) + 
+    geom_sf(data = pts_sf, aes(color = estimate,
+                               shape = signif,
+                               size = abs(estimate)),
+            size = 3.5) +
     
     # Set extent based on bounding box defined above
     coord_sf(
@@ -83,9 +90,9 @@ plot_each = function(points, cdfs) {
     # Point colors
     scale_color_gradientn(
       colours = c("darkmagenta", "red", "orange", "royalblue2"),
-      values = scales::rescale(c(-12, -5, 0, 10)),  # must match limits/data range, scaled to 0-1
-      limits = c(-12, 10),
-      name = "Change (mm)"
+      values = scales::rescale(c(-10, -5, 0, 5)),  # must match limits/data range, scaled to 0-1
+      limits = c(-10, 5),
+      name = "Δ Elevation\n(mm/month)"
     ) +
     
     ggtitle(forest_name) +

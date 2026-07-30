@@ -1,7 +1,7 @@
 #================================ Packages ================================
 
 # libraries needed
-libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial")
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial", "stringr")
 
 # install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -84,11 +84,11 @@ list(
     plot_mm_dt(lsplines)
   ),
   
-  ### Compute overall rate of change (mm/day) by transect ====
-  tar_target(
-    transect_roc,
-    roc_transect_stats(lsplines)
-  ),
+  # ### Compute overall rate of change (mm/day) by transect ====
+  # tar_target(
+  #   transect_roc,
+  #   roc_transect_stats(lsplines)
+  # ),
   
   ### Compute overall change (mm) by transect ====
   # This is used for plotting

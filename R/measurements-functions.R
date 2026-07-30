@@ -221,33 +221,24 @@ fit_lspines = function(data4){
 
 #================================ Summary Stats ================================
 
-##================================ Cumulative by Transect ================================
-# This is computing the total elevation change for each forest - hillslope_pos -
-# transect combination using only the first and last measurements.
+##================================ ROC by Transect ================================
+# This is computing the total elevation change for each forest - hillslope_pos
 
 #' [Test code]
 # path = "_stats_outputs/fit_data.xlsx"
 
 overall_transect_stats = function(path){
   
-  measurements = read_excel(path)
+  mms_overall_change = read_excel(path) %>% 
   
-  # Simplify measurement data to have have only the overall elevation change at 
-  # each pin plus the first measurement
-  mms_overall_change = measurements %>% 
-    group_by(forest, slope_pos) %>% 
-    filter(date == max(date) |
-             date == min(date)) %>%  # Last and first measurement 
-             #date == sort(unique(date))[2]) %>%  # Last and second measurement
-    ungroup() %>% 
-  
-    # Fit linear models to get mean change of each 'array' (each forest, slope_pos, 
-    # transect combo) with summary statistics.
+  # Fit linear models to get mean change of each 'array' (each forest, slope_pos, 
+  # transect combo) with summary statistics.
     group_by(forest, slope_pos, transect) %>% 
-    summarise(
-      estimate = as.numeric(tidy(lm(mm - 0 ~ 1))["estimate"]),
-      std_error = as.numeric(tidy(lm(mm - 0 ~ 1))["std.error"]),
-      p_value = as.numeric(tidy(lm(mm - 0 ~ 1))["p.value"]),
+    
+    summarise( 
+      estimate = as.numeric(tidy(lm(mm ~ dayof))[2, "estimate"] * 30.4), # in mm/month
+      std_error = as.numeric(tidy(lm(mm ~ dayof))[2, "std.error"] * 30.4), # in mm/month
+      p_value = as.numeric(tidy(lm(mm ~ dayof))[2, "p.value"] * 30.4),
       .groups = "drop"
     ) %>% 
     ungroup()
@@ -256,87 +247,85 @@ overall_transect_stats = function(path){
 }
 
 
-##================================ ROC by Transect ================================
-# This is computing the rate of elevation change for each forest - hillslope_pos -
-# transect combination using only the first and last measurements.
-
-#' [Test code]
-# path = "_stats_outputs/fit_data.xlsx"
-
-roc_transect_stats = function(path){
-  
-  measurements = read_excel(path)
-  
-  
-  # Simplify measurement data to have have only the overall elevation change at 
-  # each pin plus the second measurement
-  mms_overall_change = measurements %>% 
-    group_by(forest, slope_pos) %>% 
-    filter(date == max(date) |
-             date == min(date)) %>%  # Last and first measurement 
-             #date == sort(unique(date))[2]) %>%  # Last and second measurement
-    ungroup()
-  
-  # Create a list of forests in the data set
-  forest_list = unique(mms_overall_change$forest)
-  
-  # Run for loop to fit a lm for each forest that fits a linear model testing 
-  # BS significance and whether FS is
-  # significantly different than BS.
-  
-  # First loop filters by forest
-  for(i in 1:length(forest_list)){
-    # Filter overall dataset for only forest i data
-    data = mms_overall_change %>% 
-      filter(forest == forest_list[i])
-    
-    # Fit model using effects coding to produce a BS estimate representing
-    # the mean change from baseline to final measurement and an FS estimate 
-    # representing the change from the BS, also reflected in p values.
-    lm = lm(data = data, mm ~ date * slope_pos * transect - date) # effects coding for model, add "- dayof"
-    
-    # Create a df from the tibble model summary ouput
-    df = tidy(lm) %>% 
-      # Rename key columns
-      rename(
-        std_error = std.error,
-        p_value = p.value
-      ) %>% 
-      # Pull from the term our wanted columns 
-      mutate(
-        forest = forest_list[i],
-        slope_pos = case_when(
-          grepl("BS", term) ~ "BS",
-          grepl("FS", term) ~ "FS",
-          TRUE ~ "BS"
-        ),
-        transect = case_when(
-          grepl("north", term) ~ "north",
-          grepl("south", term) ~ "south",
-          grepl("east", term) ~ "east",
-          grepl("west", term) ~ "west",
-          TRUE ~ "central"
-        )
-      ) %>% 
-      # Keep only slopes, not intercepts
-      filter(grepl("date", term)) %>% 
-      # Reorder columns
-      select(forest, transect, slope_pos, estimate, std_error, p_value)
-      
-    mms_transect <- if (i == 1) df else bind_rows(mms_transect, df)
-    
-  }
-  
-  mms_transect %>% mutate(a = estimate * 90)
-  
-  
-  return(mms_transect)
-}
+#' ##================================ ROC by Transect ================================
+#' # This is computing the rate of elevation change for each forest - hillslope_pos -
+#' # transect combination using only the first and last measurements.
+#' 
+#' #' [Test code]
+#' # path = "_stats_outputs/fit_data.xlsx"
+#' 
+#' roc_transect_stats = function(path){
+#'   
+#'   measurements = read_excel(path)
+#'   
+#'   
+#'   # Simplify measurement data to have have only the overall elevation change at 
+#'   # each pin plus the second measurement
+#'   mms_overall_change = measurements %>% 
+#'     group_by(forest, slope_pos) %>% 
+#'     filter(date == max(date) |
+#'              date == min(date)) %>%  # Last and first measurement 
+#'              #date == sort(unique(date))[2]) %>%  # Last and second measurement
+#'     ungroup()
+#'   
+#'   # Create a list of forests in the data set
+#'   forest_list = unique(mms_overall_change$forest)
+#'   
+#'   # Run for loop to fit a lm for each forest that fits a linear model testing 
+#'   # BS significance and whether FS is
+#'   # significantly different than BS.
+#'   
+#'   # First loop filters by forest
+#'   for(i in 1:length(forest_list)){
+#'     # Filter overall dataset for only forest i data
+#'     data = mms_overall_change %>% 
+#'       filter(forest == forest_list[i])
+#'     
+#'     # Fit model using effects coding to produce a BS estimate representing
+#'     # the mean change from baseline to final measurement and an FS estimate 
+#'     # representing the change from the BS, also reflected in p values.
+#'     lm = lm(data = data, mm ~ date * slope_pos * transect - date) # effects coding for model, add "- dayof"
+#'     
+#'     # Create a df from the tibble model summary ouput
+#'     df = tidy(lm) %>% 
+#'       # Rename key columns
+#'       rename(
+#'         std_error = std.error,
+#'         p_value = p.value
+#'       ) %>% 
+#'       # Pull from the term our wanted columns 
+#'       mutate(
+#'         forest = forest_list[i],
+#'         slope_pos = case_when(
+#'           grepl("BS", term) ~ "BS",
+#'           grepl("FS", term) ~ "FS",
+#'           TRUE ~ "BS"
+#'         ),
+#'         transect = case_when(
+#'           grepl("north", term) ~ "north",
+#'           grepl("south", term) ~ "south",
+#'           grepl("east", term) ~ "east",
+#'           grepl("west", term) ~ "west",
+#'           TRUE ~ "central"
+#'         )
+#'       ) %>% 
+#'       # Keep only slopes, not intercepts
+#'       filter(grepl("date", term)) %>% 
+#'       # Reorder columns
+#'       select(forest, transect, slope_pos, estimate, std_error, p_value)
+#'       
+#'     mms_transect <- if (i == 1) df else bind_rows(mms_transect, df)
+#'     
+#'   }
+#'   
+#'   mms_transect %>% mutate(a = estimate * 90)
+#'   
+#'   
+#'   return(mms_transect)
+#' }
 
 ##================================ ROC by Slope Pos ================================
 # This is computing the rate of elevation change for each forest - hillslope_pos 
-# combination using only the first and last measurements.
-
 
 #' [Test code]
 # path = "_stats_outputs/fit_data.xlsx"
@@ -344,16 +333,7 @@ roc_transect_stats = function(path){
 roc_slopepos_stats = function(path){
   
   # Pull data from /_stats_outputs
-  measurements = read_excel(path)
-  
-  # Simplify measurement data to have have only the overall elevation change at 
-  # each pin
-  mms_overall_change = measurements %>% 
-    group_by(forest, slope_pos) %>% 
-    filter(date == max(date) |
-             date == min(date)) %>%  # Last and first measurement 
-             #date == sort(unique(date))[2]) %>%  # Last and second measurement
-    ungroup()
+  mms_overall_change = read_excel(path)
   
   
   # Create a list of forests in the dataset
@@ -376,31 +356,28 @@ roc_slopepos_stats = function(path){
   for(i in 1:length(forest_list)){
     # Filter overall dataset for only forest i data
     data = mms_overall_change %>% 
-      filter(forest == forest_list[i]) %>% 
-      
-      # Convert date into days past first day, to prevent fitting to seconds
-      mutate(date = as.numeric(date - min(date), units = "days"))
+      filter(forest == forest_list[i])
     
     # Fit model using effects coding to produce a BS estimate representing
     # the mean change from baseline to final measurement and an FS estimate 
     # representing the change from the BS, also reflected in p values.
-    lm = lm(data = data, mm ~ date * slope_pos) # effects coding for model, add "- dayof"
+    lm = lm(data = data, mm ~ dayof * slope_pos) # effects coding for model, add "- dayof"
     
     # Build data frame using model outputs
     mms_slope_pos[i,"forest"] = forest_list[i] # Forest column
     
     # Backslope coefs
-    mms_slope_pos[i, "estimate_bs"] = tidy(lm)[2, "estimate"] # mm/day
-    mms_slope_pos[i, "std_error_bs"] = tidy(lm)[2, "std.error"]
+    mms_slope_pos[i, "estimate_bs"] = tidy(lm)[2, "estimate"] * 30.4 # mm/month
+    mms_slope_pos[i, "std_error_bs"] = tidy(lm)[2, "std.error"] * 30.4 # mm/month
     mms_slope_pos[i, "p_value_bs"] = tidy(lm)[2, "p.value"] 
     
     # Footslope coefs
-    mms_slope_pos[i, "estimate_fs"] = tidy(lm)[2, "estimate"] + tidy(lm)[4, "estimate"] # mm/day
-    mms_slope_pos[i, "std_error_fs"] = tidy(lm)[4, "std.error"]
+    mms_slope_pos[i, "estimate_fs"] = tidy(lm)[2, "estimate"] + tidy(lm)[4, "estimate"] * 30.4 # mm/month
+    mms_slope_pos[i, "std_error_fs"] = tidy(lm)[4, "std.error"] * 30.4 # mm/month
     mms_slope_pos[i, "p_value_fs"] = tidy(lm)[4, "p.value"]
     
     # Supporting columns
-    mms_slope_pos[i, "dt"] = max(data$date)
+     mms_slope_pos[i, "dt"] = as.numeric(max(data$date) - min(data$date), units = "days")
 
   }
   
@@ -420,7 +397,7 @@ roc_slopepos_stats = function(path){
 #================================ Erosion Totals (Units) ================================
 
 #' [Test Code]
-# slope_pos_roc = tar_read(slope_pos_roc); baumann_bd = tar_read(baumann_bd)
+# slope_pos_roc = tar_read(slope_pos_roc); bd = tar_read(baumann_bd)
 
 convert_units = function(slope_pos_roc, bd){
   
@@ -447,16 +424,19 @@ convert_units = function(slope_pos_roc, bd){
   
   # Clean up lm coefficients
   erosion_df = slope_pos_roc %>%
-    # Convert lm estimates from mm/day to mm
-    mutate(across(starts_with("estimate") | starts_with("std"), ~ . * dt)) %>% 
+    
+    # Create a mm column from estimate
+    mutate(
+      estimate_mm = estimate / 30.4 * dt,
+      std_error_mm = std_error / 30.4 * dt,
     
     # Add worms columns
-    mutate(
       worms = case_when(
         forest %in% c("ASH", "LRE", "LRW", "AREF", "LREF") ~ "EW",
         forest %in% c("MAG", "WD", "LRJ") ~ "JW"
       )
-    )
+    ) 
+  
       
   # Join dataframes
   erosion_bd = left_join(
@@ -478,11 +458,11 @@ convert_units = function(slope_pos_roc, bd){
   
     mutate(
       # Compute erosion in metric tons/km2
-      tons_km2 = estimate / 10 # Convert to cm
+      tons_km2 = estimate_mm / 10 # Convert to cm
       * bd_mean # Compute in g/cm2,
       * 10000, # Convert to t/km2
       # Compute SE
-      tons_km2_se = propogate_error(estimate, std_error, bd_mean, bd_se, tons_km2),
+      tons_km2_se = propogate_error(estimate_mm, std_error_mm, bd_mean, bd_se, tons_km2),
     
       
       # Compute erosion in imperial ton/acre
@@ -728,8 +708,10 @@ table_erosion_totals = function(path){
   df = data %>% 
     # Round values
     mutate(
-      estimate = round(estimate, digits = 2),
-      std_error = round(std_error, digits = 2),
+      estimate_mm = round(estimate_mm, digits = 2),
+      std_error_mm = round(std_error_mm, digits = 2),
+      dt = round(dt, digits = 0),
+      
       bd_mean = signif(bd_mean, digits = 3),
       bd_se = signif(bd_se, digits = 3),
       
@@ -765,20 +747,24 @@ table_erosion_totals = function(path){
     
   
   # Define a border, needed in table
-  box_cols <- c("estimate", "tons_km2", "tons_acre")
+  box_cols <- c("estimate_mm", "tons_km2", "tons_acre")
   outline_border <- fp_border(color = "red", width = 1.5)   
   
   # Build flextable
   erosion_units_ft = flextable(df, 
                                col_keys = c("worms",
                                             "forest",
-                                            #"dt",
                                             "type",
                                             "blank1",
                                             "estimate",
                                             "std_error",
                                             "p_value",
                                             "blank2",
+                                            "dt",
+                                            "blank5",
+                                            "estimate_mm",
+                                            "std_error_mm",
+                                            "blank4",
                                             #"worms",
                                             #"bd_mean",
                                             #"bd_se",
@@ -802,11 +788,13 @@ table_erosion_totals = function(path){
     
     width(j = c("worms",
                 "forest",
-                #"dt",
                 "type",
                 "estimate",
                 "std_error",
                 "p_value",
+                "dt",
+                "estimate_mm",
+                "std_error_mm",
                 #"worms",
                 #"bd_mean",
                 #"bd_se",
@@ -818,13 +806,15 @@ table_erosion_totals = function(path){
     line_spacing(space = 1.8, part = "header") %>% 
 
     add_header_row(values = c("",
-                              "Δ Elevation (mm)",
-                              #"Bulk Desnity (g/cm³)",
-                              "Tonnes/km2",
-                              "Tons/acre"),
+                              "Statistics (mm/month)",
+                              "",
+                              "mm/yr**",
+                              "tonnes/km2/yr",
+                              "tons/acre/yr"),
                    colwidths = c(4, # adds up to total number of cols
+                                 2,
+                                 3,
                                  4,
-                                 #3,
                                  3,
                                  2)) %>% 
     
@@ -833,10 +823,19 @@ table_erosion_totals = function(path){
       j = "estimate",
       value = as_paragraph(
         as_chunk(formatC(estimate, format = "f", digits = 2)),
-        as_chunk(" mm", props = fp_text(color = "grey50", font.size = 8)),
+        as_chunk(" mm/mo", props = fp_text(color = "grey50", font.size = 8)),
         as_chunk(ifelse(p_value < 0.05, "*", ""))
       )
     ) %>% 
+    
+    mk_par(
+      j = "estimate_mm",
+      value = as_paragraph(
+        as_chunk(formatC(estimate_mm, format = "f", digits = 2)),
+        as_chunk(" mm", props = fp_text(color = "grey50", font.size = 8)),
+        as_chunk(ifelse(p_value < 0.05, "*", ""))
+      )
+    ) %>%
     
     mk_par(
       j = "tons_km2",
@@ -853,6 +852,15 @@ table_erosion_totals = function(path){
         as_chunk(formatC(tons_acre, format = "f", digits = 2)),
         as_chunk(" t/ac", props = fp_text(color = "grey50", font.size = 8)),
         as_chunk(ifelse(p_value < 0.05, "*", ""))
+      )
+    ) %>%
+    
+    # Add x to dt
+    mk_par(
+      j = "dt",
+      value = as_paragraph(
+        as_chunk(formatC(tons_km2, format = "f", digits = 0)),
+        as_chunk(" days", props = fp_text(color = "grey50", font.size = 8))
       )
     ) %>%
     
@@ -878,8 +886,8 @@ table_erosion_totals = function(path){
     
     
     # Change widths of SE
-    width(j = c("std_error", "tons_km2_se", "tons_acre_se", "p_value"), width = 0.9) %>% 
-    align(j = c("std_error", "tons_km2_se", "tons_acre_se", "p_value"), align = "center", part = "all") %>% 
+    width(j = c("std_error", "tons_km2_se", "tons_acre_se", "p_value", "dt"), width = 0.9) %>% 
+    align(j = c("std_error", "tons_km2_se", "tons_acre_se", "p_value", "dt"), align = "center", part = "all") %>% 
     
     
     # Edit width of estimates
@@ -915,11 +923,6 @@ table_erosion_totals = function(path){
            part = "body") %>% 
   
     
-    # # Add units to mm, just a trial
-    # set_formatter(
-    #   estimate  = function(x) paste0(x, " mm", "")
-    #   ) %>% 
-    
   labelizor(
       part = "header", 
       labels = c("forest" = "Forest",
@@ -927,6 +930,9 @@ table_erosion_totals = function(path){
                  "estimate" = "Estimate",
                  "std_error" = "SE",
                  "p_value" = "p-value",
+                 "dt" = "Total days",
+                 "estimate_mm" = "Estimate",
+                 "std_error_mm" = "SE",
                  "tons_km2" = "Estimate",
                  "tons_km2_se" = "SE",
                  "tons_acre" = "Estimate",
@@ -979,13 +985,13 @@ plot_mm_dt = function(path){
               linetype = 1,
               alpha = 0.5) +
     
-    # # Plot boxplots for each forest and slope position
-    # geom_boxplot(aes(group = forest_date,
-    #                  width = 3,
-    #                  fill = slope_pos
-    #                  ),
-    #              alpha = 1) +
-    
+    # Plot boxplots for each forest and slope position
+    geom_boxplot(aes(group = forest_date,
+                     width = 3,
+                     fill = slope_pos
+                     ),
+                 alpha = 1) +
+
     # Plot lspline fits
     geom_line(
       aes(x = date,

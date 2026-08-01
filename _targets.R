@@ -50,7 +50,7 @@ list(
   ### Pull erosion pin measurement data ====
   tar_target(
     raw_measurements,
-    pull_measurements("C:/Users/natha/Box/_data/_erosion_pins/ARB-LR_raw.xlsx", "2025")
+    pull_measurements("C:/Users/natha/Box/_data/_erosion_pins/2025_ARB-LR_raw.xlsx", "Sheet1")
   ),
   
   ### Clean up erosion pin data ====

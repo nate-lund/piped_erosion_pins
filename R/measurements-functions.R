@@ -342,12 +342,14 @@ roc_slopepos_stats = function(path){
   # Create a df to hold coefs
   nforest = rep(NA, times = length(forest_list))
   mms_slope_pos = data.frame(forest = nforest,
+                             #r_squared = nforest,
                              estimate_bs = nforest,
                              std_error_bs = nforest,
                              p_value_bs = nforest,
                              estimate_fs = nforest,
                              std_error_fs = nforest,
-                             p_value_fs = nforest) # Not the sig of FS, but diff
+                             p_value_fs = nforest, # Not the sig of FS, but diff
+                             ) 
   
 
   # For loop to fit a lm for each forest: estimate ~ date * slope_pos - 1
@@ -363,8 +365,13 @@ roc_slopepos_stats = function(path){
     # representing the change from the BS, also reflected in p values.
     lm = lm(data = data, mm ~ dayof * slope_pos) # effects coding for model, add "- dayof"
     
+    summary(lm)$adj.r.squared
+    
     # Build data frame using model outputs
     mms_slope_pos[i,"forest"] = forest_list[i] # Forest column
+    
+    # Overall R squared
+    #mms_slope_pos[i,"r_squared"] = summary(lm)$adj.r.squared
     
     # Backslope coefs
     mms_slope_pos[i, "estimate_bs"] = tidy(lm)[2, "estimate"] * 30.4 # mm/month
@@ -529,7 +536,7 @@ frame_mmdt = function(path){
 #' [Test code]
 # frame = tar_read(mms_frame)
 
-table_mmdt = function(frame){
+table_mm_dt = function(frame){
   
   # Remove duplicated forest names
   H3_final_table.df <- H3_final_table.df %>%
@@ -702,10 +709,9 @@ table_mmdt = function(frame){
 
 table_erosion_totals = function(path){
   
-  data = read_excel("_stats_outputs/erosion_totals.xlsx")
-
-    # Do some cleanup
-  df = data %>% 
+  # Format Datatable
+  df = read_excel("_stats_outputs/erosion_totals.xlsx") %>% 
+    
     # Round values
     mutate(
       estimate_mm = round(estimate_mm, digits = 2),
@@ -733,7 +739,7 @@ table_erosion_totals = function(path){
       worms == "JW" ~ "Jumping worm",
       worms == "EW" ~ "European worm"
     )) %>% 
-  
+    
     
     # Remove duplicated forest names
     mutate(forest = as.character(forest)) %>%
@@ -744,7 +750,7 @@ table_erosion_totals = function(path){
     # Order
     mutate(forest = factor(forest, levels = c("ASH", "LRW", "LRE", "MAG", "WD", "LRJ"))) %>% 
     arrange(forest)
-    
+  
   
   # Define a border, needed in table
   box_cols <- c("estimate_mm", "tons_km2", "tons_acre")
@@ -808,13 +814,13 @@ table_erosion_totals = function(path){
     add_header_row(values = c("",
                               "Statistics (mm/month)",
                               "",
-                              "mm/yr**",
+                              "mm/yr",
                               "tonnes/km2/yr",
                               "tons/acre/yr"),
                    colwidths = c(4, # adds up to total number of cols
+                                 4,
                                  2,
                                  3,
-                                 4,
                                  3,
                                  2)) %>% 
     
@@ -939,7 +945,7 @@ table_erosion_totals = function(path){
                  "tons_acre_se" = "SE"
       ))
   
-  erosion_units_ft
+  
   
   path = "_plot_outputs/erosion_totals.svg"
   save_as_image(erosion_units_ft, path = path)
@@ -947,6 +953,7 @@ table_erosion_totals = function(path){
   path2 = "_plot_outputs/erosion_totals.png"
   save_as_image(erosion_units_ft, path = path2)
 
+  return(erosion_units_ft)
   
   }
 

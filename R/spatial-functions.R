@@ -3,7 +3,6 @@
 #' [Test code]
 # data = tar_read(points)
 
-
 pull_dems = function(data){
   
   # Pull data
@@ -59,10 +58,10 @@ pull_dems = function(data){
     # Write elevation data to a temporary place then pull into a DEM
     tmp = tempfile(fileext = ".tif")
     writeBin(content(res, "raw"), tmp)
-    dem = rast(tmp)
+    dem_raw = rast(tmp)
     
     # Reproject to UTM Zone 15N
-    dem = project(dem, "EPSG:32615")
+    dem = project(dem_raw, "EPSG:32615")
     
     # Compute derivatives
     slope  <- terrain(dem, v = "slope", unit = "degrees")

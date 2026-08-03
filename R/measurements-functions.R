@@ -348,7 +348,7 @@ roc_slopepos_stats = function(path){
                              p_value_bs = nforest,
                              estimate_fs = nforest,
                              std_error_fs = nforest,
-                             p_value_fs = nforest, # Not the sig of FS, but diff
+                             p_value_fs = nforest # Not the sig of FS, but diff
                              ) 
   
 

@@ -17,9 +17,8 @@ lapply(libs, library, character.only = T)
 
 # Set target options:
 tar_option_set(
-  packages = c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4",
-               "tidyr", "dplyr", "readr", "targets", "usethis", "targets",
-               "visNetwork", "tarchetypes", "tidyterra") # Packages that your targets need for their tasks.
+  packages = c(libs), # Packages that your targets need for their tasks.
+  error = "continue" # tar_make() will continue even if it hits one error
 )
 
 # Run the R scripts in the R/ folder with functions
@@ -84,12 +83,6 @@ list(
     plot_mm_dt(lsplines)
   ),
   
-  # ### Compute overall rate of change (mm/day) by transect ====
-  # tar_target(
-  #   transect_roc,
-  #   roc_transect_stats(lsplines)
-  # ),
-  
   ### Compute overall change (mm) by transect ====
   # This is used for plotting
   tar_target(
@@ -137,14 +130,15 @@ list(
   ## Spatial Functions ====
   ### Locate GPS locations based on file path ====
   tar_target(
-    name = find_data,
+    find_data,
     "C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv"
   ),
   
   ### Import CSV into R ====
   tar_target(
-    name = points,
-    command = get_points(find_data)
+    points,
+    read_csv("C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv",
+             show_col_types = FALSE)
   ),
   
   ### Pull DEMs from OpenTopography API. Export as netCDF files ====

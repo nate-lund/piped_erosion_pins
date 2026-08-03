@@ -1,17 +1,14 @@
-#================================ Pull point data ================================
-
-get_points = function(path) {
-  csv = read_csv(path,
-           col_types = cols())
-  return(csv)
-  }
-
-#' [Test code]
-# points = get_points("C:/Users/natha/Box/_data/_spatial/_erosion-pins/ARB-LR_erosion-pin-arrays.csv")
-
 #================================ Pull DEMs ================================
 
-pull_dems = function(file){
+#' [Test code]
+# data = tar_read(points)
+
+
+pull_dems = function(data){
+  
+  # Pull data
+  file = data
+  
   # OpenTopography USGS 1m DEM API: https://portal.opentopography.org/API/usgsdem
   # API key:
   key = "a87bd1c14527afae952eb48288ca7ec3"

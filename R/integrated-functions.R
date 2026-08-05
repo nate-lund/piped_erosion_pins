@@ -154,13 +154,16 @@ plot_all = function(plots){
   legend = get_legend(plots[[4]] + theme(legend.position = "left"))
   
   # Plot together
-  plot_panel = plot_grid(plotlist = plots_stipped[c(6, 2, 1, 4, 5, 3)], ncol = 3)
-  grid = plot_grid(plot_panel, legend, rel_widths = c(1.2, 0.15))
+  plot_panel = plot_grid(plotlist = plots_stipped[c(6, 2, 1, 4, 5, 3)],
+                         ncol = 3)
+  grid = plot_grid(NULL, plot_panel, legend,
+                   rel_widths = c(0.05, 1.2, 0.15),
+                   ncol = 3)
   
   # Save plot as file
   ggsave("_plot_outputs/all_plot.png", grid, width = 9, height = 6)
   
-  return()
+  return(grid)
 }
 
 
@@ -199,5 +202,25 @@ extract_slope = function(points, cdfs) {
   
   
   return(pts_sf)
+}
+
+
+#================================ Figure 2 ================================
+
+#' [Test code]
+# space = tar_read(all_plots); time = tar_read(plot_mmdt)
+
+build_fig2 = function(space, time){
+  
+  fig2 = plot_grid(space, time,
+            #rel_width = c(0.9, 1),
+            ncol = 1,
+            labels = c("A)", "B)"),
+            label_size = 14)
+  
+  ggsave("_plot_outputs/figure_2.png", fig2, bg = "white", width = 9, height = 12)
+  
+  return(fig2)
+  
 }
 

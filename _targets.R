@@ -1,5 +1,8 @@
 #================================ Packages ================================
+
+# Set environment for TERRA
 Sys.setenv(PROJ_LIB = "C:/Users/natha/AppData/Local/R/win-library/4.6/terra/proj")
+
 # libraries needed
 libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial", "stringr")
 
@@ -102,7 +105,7 @@ list(
   ### Pull Baumann et al. 2025 data ====
   tar_target(
     baumann_bd,
-    read_xlsx("C:/Users/natha/Box/_data/_outside_data/Baumenn-et-al_BD-values.xlsx")
+    read_excel("C:/Users/natha/Box/_data/_outside_data/Baumenn-et-al_BD-values.xlsx")
   ),
   
   ### Compute back of envelope unit computations using Baumann et al. data ====
@@ -188,6 +191,12 @@ list(
   tar_target(
     points_mms_slope,
     bind_rows(slope_extracted)
+  ),
+  
+  ### Build Figure 2 ====
+  tar_target(
+    figure2,
+    build_fig2(all_plots, plot_mmdt)
   )
   
   )

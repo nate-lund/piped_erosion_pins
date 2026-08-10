@@ -825,6 +825,14 @@ table_erosion_totals = function(path){
                                  2)) %>% 
     
     # * all significant values, add units 
+    
+    mk_par(
+      j = "std_error",
+      value = as_paragraph(
+        as_chunk(formatC(estimate_mm, format = "f", digits = 2))
+      )
+    ) %>%
+    
     mk_par(
       j = "estimate",
       value = as_paragraph(

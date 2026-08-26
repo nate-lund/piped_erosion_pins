@@ -106,6 +106,39 @@ pull_dems = function(data){
 
 
 
+#================================ Pull slope at points ================================
+
+#' [Test code]
+#cdfs = "C:/Users/natha/Documents/_git-projects/piped_erosion_pins/_topo_outputs/topo-output_ASH.nc"
+
+#points = tar_read(points_mms)
+
+
+extract_slope = function(points, cdfs) {
+  
+  # Extract slope from CDF
+  stack = rast(cdfs) # Convert to raster stack
+  rast = stack[["slope"]] # Pull slope raster
+  
+  # Set CRS of raster to UTM 15N (it already is, but we must assign it)
+  crs(rast) <- "EPSG:32615"
+  
+  # Convert points dataframe to a usable sf
+  pts_sf = st_as_sf(points,
+                    coords = c("esrignss_longitude", "esrignss_latitude"),
+                    crs = 4326) %>% # Points are recorded in WGS lat long
+    st_transform(32615) %>%  # Transform to UTM Zone 15N
+    st_crop(ext(rast)) # Crop points by DEM extent
+  
+  # Extract slope values at each point
+  extracted = terra::extract(rast, pts_sf)
+  
+  # Bind slope values back to the points
+  pts_sf$slope = extracted$slope
+  
+  
+  return(pts_sf)
+}
 
 
 

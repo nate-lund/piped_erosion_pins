@@ -2,7 +2,6 @@ name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iterat
 cdfs|pattern|31dbd60cf404bb42|0d260f17cbbb0ef2||-1083873008||||1637376|file|local|vector||cdfs_8e57bf1e601b7b00*cdfs_b7478143786146b3*cdfs_a1c7eeafe12b3b76*cdfs_9478f58669e9cc26*cdfs_e12e104faeb3de2e*cdfs_ba4b258d9d80cc1d|0||
 slope_extracted|pattern|ee28ca73d35f4ebd|b8d00e03e031d8f4||-1785201348||||12522|rds|local|vector||slope_extracted_3ec53da55a645a85*slope_extracted_d85dd1aad079ed34*slope_extracted_7d0f38ebb2c3231a*slope_extracted_ade62be95181540b*slope_extracted_80409a4a775b9eca*slope_extracted_a9227a4e0becc29a|0.38||
 lsplines|stem|25b384e2c66f7e70|a00869249b5b658e|f8d9f4958ae2fb9d|2104690896|_stats_outputs/fit_data.xlsx|t20668.8132387474s|s126665b|126665|file|local|vector|||0.43||
-indv_plots|pattern|c4e8f7c921617871|94c0f25332d8f045||183193026||||12146213|rds|local|list||indv_plots_3ec53da55a645a85*indv_plots_d85dd1aad079ed34*indv_plots_7d0f38ebb2c3231a*indv_plots_ade62be95181540b*indv_plots_80409a4a775b9eca*indv_plots_a9227a4e0becc29a|3.94||
 raw_measurements|stem|f508fdb93866b16d|a5e23416759498e8|772e94265eb61bdb|687031044||t20668.8736756707s|s9174b|9174|rds|local|vector|||0.09||
 points|stem|fb5b12beaee2f99b|696286237179cc80|2c530c1562a7fbd1|-1464275451||t20668.8736788394s|s2641b|2641|rds|local|vector|||0.21||
 find_data|stem|974ac6cb985e2a01|7e72c91c3f1a5fd9|2c530c1562a7fbd1|-1994645127||t20668.8736790197s|s119b|119|rds|local|vector|||0||
@@ -17,16 +16,8 @@ cdfs_9478f58669e9cc26|branch|9cd59d710aa9eb22|0d260f17cbbb0ef2|2c530c1562a7fbd1|
 cdfs_e12e104faeb3de2e|branch|b49531a518d6dc0d|0d260f17cbbb0ef2|2c530c1562a7fbd1|-703814438|_topo_outputs/topo-output_WD.nc|t20668.8743003307s|s272896b|272896|file|local|vector|cdfs||0||
 cdfs_ba4b258d9d80cc1d|branch|dc72848c73c20100|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1916800234|_topo_outputs/topo-output_ASH.nc|t20668.874422038s|s272896b|272896|file|local|vector|cdfs||0||
 transect_overall|stem|c136678eb99ba558|c339e4d3f6dd5a24|b1c6627c579a4081|-1379839151||t20668.8744744542s|s1202b|1202|rds|local|vector|||0.27||
-plot_mmdt|stem|b46295ba6c2f3de5|d5601df21d0c23b7|c02f4b71be807136|-626711285||t20668.8745184007s|s785279b|785279|rds|local|vector|||3.44|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
-mms_frame|stem|79a0f2d8929604b7|887e944e7e946adc|3d0dcd8528aad349|-1626745210||t20668.8745195465s|s1131b|1131|rds|local|vector|||0.07||
 slope_pos_roc|stem|3e4e6588096cb61f|9021c06df9211070|68dff5d1636e6070|1931267301||t20668.8745214013s|s556b|556|rds|local|vector|||0.14||
 points_plus_mms|stem|89af50375f27342e|c4d990246c8f5eec|ee40e3ba1e225ed4|-1002162867||t20668.8745218746s|s3308b|3308|rds|local|vector|||0||
-indv_plots_3ec53da55a645a85|branch|027b1b6bafaed24a|94c0f25332d8f045|dcfdbbe1f2b17a04|-262423925||t20668.8745491303s|s2002200b|2002200|rds|local|list|indv_plots||0.67|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_d85dd1aad079ed34|branch|ffc8514730779d76|94c0f25332d8f045|acd4169d431c0587|-1899512493||t20668.8745709411s|s2031626b|2031626|rds|local|list|indv_plots||0.6|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_7d0f38ebb2c3231a|branch|6066444fcbcb37e2|94c0f25332d8f045|ccf2b915f9bee403|-1590872505||t20668.8745956799s|s2027535b|2027535|rds|local|list|indv_plots||0.85|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_ade62be95181540b|branch|13e0a552a097d31c|94c0f25332d8f045|6859cfbe5722b770|1071516154||t20668.8746168724s|s2027111b|2027111|rds|local|list|indv_plots||0.55|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_80409a4a775b9eca|branch|2f375538660194be|94c0f25332d8f045|7e11156e002c228d|-276787903||t20668.8746379235s|s2023920b|2023920|rds|local|list|indv_plots||0.52|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_a9227a4e0becc29a|branch|9db0a219341cba37|94c0f25332d8f045|96e5484f46d1725a|913911112||t20668.8746593013s|s2033821b|2033821|rds|local|list|indv_plots||0.53|attribute variables are assumed to be spatially constant throughout all geometries|
 slope_extracted_3ec53da55a645a85|branch|484ce9d9e91f8398|b8d00e03e031d8f4|6ee0932c0569e628|1131929517||t20668.8746604253s|s2091b|2091|rds|local|vector|slope_extracted||0.05|attribute variables are assumed to be spatially constant throughout all geometries|
 slope_extracted_d85dd1aad079ed34|branch|61959db8274606be|b8d00e03e031d8f4|b443d8958710ec72|1049811275||t20668.874661738s|s2086b|2086|rds|local|vector|slope_extracted||0.11|attribute variables are assumed to be spatially constant throughout all geometries|
 slope_extracted_7d0f38ebb2c3231a|branch|0cfa283177a4c878|b8d00e03e031d8f4|f330ff144b1e2184|920380597||t20668.8746622473s|s2074b|2074|rds|local|vector|slope_extracted||0.04|attribute variables are assumed to be spatially constant throughout all geometries|
@@ -36,27 +27,36 @@ slope_extracted_a9227a4e0becc29a|branch|c7183380ce6a8c21|b8d00e03e031d8f4|074edb
 points_mms_slope|stem|49d847e7baf9cd0e|cc9429c0ad7c2de1|013d2b96df24268c|-546996876||t20668.8748232473s|s4594b|4594|rds|local|vector|||0.02||
 baumann_bd|stem|949f78b84d32d98d|b296c45ea852b6b4|2c530c1562a7fbd1|-745379454||t20670.6232670863s|s2174b|2174|rds|local|vector|||0.06||
 erosion_totals_units|stem|0c311b2a0fbe04ea|b85a62304068103d|10f04d13140c4b9e|19133857|_stats_outputs/erosion_totals.xlsx|t20670.6232696557s|s7164b|7164|file|local|vector|||0.08||
-all_plots|stem|3c9875dff9f748ad|19f8fe7fed37a86f|25f7ea01fda23d3b|785210724||t20670.6451398744s|s17182050b|17182050|rds|local|vector|||3.56||
-figure2|stem|abb7067bb33a9f24|9a48e810362a83dc|560b49122af73d83|-415812717||t20670.6490502595s|s20957557b|20957557|rds|local|vector|||2.71|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
-libs|object|fe8aaa1eb0f2e703
+mms_frame|stem|79a0f2d8929604b7|887e944e7e946adc|3d0dcd8528aad349|-1626745210||t20691.8406273124s|s1131b|1131|rds|local|vector|||0.06||
+erosion_totals_ft|stem|0f44e79cb48fb5c4|9575051c6928dfe9|6fb121b7d2ec3674|1220970016||t20691.8408159396s|s10748b|10748|rds|local|vector|||4.32||
+plot_mmdt|stem|da31f3476d4af136|d5601df21d0c23b7|f16e7afa3cc87e26|-626711285||t20691.8585291777s|s962576b|962576|rds|local|vector|||3.31|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
+indv_plots_3ec53da55a645a85|branch|7f104a40e991af98|94c0f25332d8f045|f0e717500861d76b|-262423925||t20691.8881579552s|s2104241b|2104241|rds|local|list|indv_plots||0.95|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_d85dd1aad079ed34|branch|66ce1af78221e15b|94c0f25332d8f045|2b42709e1c0c6036|-1899512493||t20691.8881817076s|s2137416b|2137416|rds|local|list|indv_plots||0.71|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_7d0f38ebb2c3231a|branch|310f811d0cf5e9bd|94c0f25332d8f045|702cabc6007bbf8c|-1590872505||t20691.8882133457s|s2132270b|2132270|rds|local|list|indv_plots||0.66|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_ade62be95181540b|branch|8cce54654c21c801|94c0f25332d8f045|3701544133b9e7ca|1071516154||t20691.8882476267s|s2132114b|2132114|rds|local|list|indv_plots||0.86|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_80409a4a775b9eca|branch|5f32aeebdf595a74|94c0f25332d8f045|84271aaa8885fb2c|-276787903||t20691.8882824585s|s2130113b|2130113|rds|local|list|indv_plots||0.89|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_a9227a4e0becc29a|branch|5281794038b9e4e6|94c0f25332d8f045|207fbb317ed3e8fd|913911112||t20691.8883166324s|s2139480b|2139480|rds|local|list|indv_plots||0.89|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots|pattern|8b744054814ccf3f|94c0f25332d8f045||183193026||||12775634|rds|local|list||indv_plots_3ec53da55a645a85*indv_plots_d85dd1aad079ed34*indv_plots_7d0f38ebb2c3231a*indv_plots_ade62be95181540b*indv_plots_80409a4a775b9eca*indv_plots_a9227a4e0becc29a|4.96||
+all_plots|stem|92b3ad69be2edd25|19f8fe7fed37a86f|b8e1578e2dadc4b1|785210724||t20691.8886357249s|s20918390b|20918390|rds|local|vector|||4.48||
+libs|object|79b08f7c26f82d6b
 extract_slope|function|cbe8d3e2b41b2a39
+plot_each|function|961d967a672caece
 table_mm_dt|function|5f0eaadc4387a7cc
-plot_each|function|791e84f8d403fcf3
 convert_units|function|322a9210c8772a7a
 fit_lspines|function|355b76368dc260a8
-build_fig2|function|e2eb5a597af521f6
+build_fig2|function|979de176991ecb99
 overall_transect_stats|function|5dc1234bbe7e1266
 roc_slopepos_stats|function|6fa811ebe81c352e
-table_erosion_totals|function|34ea40b1c66285f1
 pull_dems|function|9e1ba69db3e0c93b
-.Random.seed|object|7e3985439a2237dd
+table_erosion_totals|function|34ea40b1c66285f1
+.Random.seed|object|1339e40872c25571
 data_cleanup|function|d79879436e6511c9
-installed_libs|object|f6b6bec52aeca870
-plot_all|function|5d8e9bcde4d12d83
-plot_mm_dt|function|37c850262def914f
+installed_libs|object|bb45a5cb305ab84f
+plot_all|function|ca44bfc36dd6fe1a
+plot_mm_dt|function|3faf9eb96ef8f194
 differenced_QAQC|function|f144e471472b7d80
 frame_mmdt|function|f49233ef6e026a83
 pull_measurements|function|59074c5bb72e6d89
 difference_pins|function|e5f261d0445a7192
-cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20675.7962572623s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
-erosion_totals_ft|stem|0f44e79cb48fb5c4|9575051c6928dfe9|6fb121b7d2ec3674|1220970016||t20675.7963244167s|s10748b|10748|rds|local|vector|||5.62||
+cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20691.8930071781s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
+figure2|stem|e8a27b45b8c19a2b|9a48e810362a83dc|054155e468ee2f69|-415812717||t20691.8933287305s|s25155857b|25155857|rds|local|vector|||3.87|Using `size` aesthetic for lines was deprecated in ggplot2 3.4.0. ℹ Please use `linewidth` instead. ℹ The deprecated feature was likely used in the cowplot package.   Please report the issue at <https://github.com/wilkelab/cowplot/issues>.. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|

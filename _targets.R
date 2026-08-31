@@ -4,7 +4,7 @@
 Sys.setenv(PROJ_LIB = "C:/Users/natha/AppData/Local/R/win-library/4.6/terra/proj")
 
 # libraries needed
-libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial", "stringr", "ggh4x", "ggrepel")
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial", "stringr", "ggh4x", "ggrepel", "magick")
 
 # install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -51,7 +51,9 @@ tar_source(
 # Replace the target list below with your own:
 list(
   
-  ## Measurement Functions ====
+  ##================================ Measurement Functions ================================
+  # Processing raw erosion pin measurements
+  
   ### Pull erosion pin measurement data ====
   tar_target(
     raw_measurements,
@@ -115,25 +117,9 @@ list(
     format = "file" # Saved as an .xlxs, so need this.
   ),
   
-  ### Make flextable erosion totals ====
-  tar_target(
-    erosion_totals_ft,
-    table_erosion_totals(erosion_totals_units)
-  ),
+  ##================================ Spatial Functions ================================
+  # Analysis of DEMs from Opentopo API and GPS points collected in-field.
   
-  ### Make df for mms over time ====
-  tar_target(
-    mms_frame,
-    frame_mmdt(lsplines)
-  ),
-  
-  # Target 2: Make a nice publication-quality table for mms over time 
-  # tar_target(
-  #   mms_table,
-  #   table_mmdt(mms_df)
-  # ),
-  
-  ## Spatial Functions ====
   ### Locate GPS locations based on file path ====
   tar_target(
     find_data,
@@ -159,21 +145,6 @@ list(
     cdf_paths
   ),
   
-  ## Integrated Functions ====
-  ### Plots rasters and point data together, unique plot for each forest ====
-  tar_target(
-    indv_plots,
-    plot_each(points_plus_mms, cdfs),
-    pattern = map(cdfs),
-    iteration = "list"
-  ),
-  
-  ### Put dem/point plots in a list ====
-  tar_target(
-    all_plots,
-    plot_all(indv_plots)
-  ),
-  
   ### Combine point (GPS) data and measurement data ====
   tar_target(
     points_plus_mms,
@@ -193,15 +164,67 @@ list(
     bind_rows(slope_extracted)
   ),
   
+  ##================================ Plotting Functions ================================
+  # Create figures 1 and 2 and derivative plots.
+  
+  ### Plots rasters and point data together, unique plot for each forest ====
+  tar_target(
+    indv_plots,
+    plot_each(points_plus_mms, cdfs),
+    pattern = map(cdfs),
+    iteration = "list"
+  ),
+  
+  ### Plot all DEMs together ====
+  tar_target(
+    all_plots,
+    plot_all(indv_plots)
+  ),
+  
+  ### Make flextable erosion totals ====
+  tar_target(
+    erosion_totals_ft,
+    table_erosion_totals(erosion_totals_units),
+    format = "file" # Saved as an .png, so need this.
+  ),
+  
+  ### Make df for mms over time ====
+  # tar_target(
+  #   mms_frame,
+  #   frame_mmdt(lsplines)
+  # ),
+  
+  ### Make flextable for mms over time 
+  # tar_target(
+  #   mms_table,
+  #   table_mmdt(mms_df)
+  # ),
+  
+  ### Build Figure 1 ====
+  tar_target(
+    figure1,
+    build_fig1(all_plots, plot_mmdt)
+  ),
+  
+  ### Pull Figure 2B ====
+  tar_target(
+    figure_2b,
+    "_inputs/figure_2b.png",
+    format = "file"
+  ),
+  
   ### Build Figure 2 ====
   tar_target(
     figure2,
-    build_fig2(all_plots, plot_mmdt)
+    build_fig2(erosion_totals_ft, figure_2b)
   )
   
   )
 
-#================================ Something ================================  
+
+
+#================================ Stuff ================================  
+
 
 # tar_manifest()
 

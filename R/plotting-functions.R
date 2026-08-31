@@ -442,7 +442,7 @@ table_mm_dt = function(frame){
 
 table_erosion_totals = function(path){
   
-  # Format Datatable
+  # Format datatable before building FT
   df = read_excel("_stats_outputs/erosion_totals.xlsx") %>% 
     
     # Round values
@@ -486,7 +486,7 @@ table_erosion_totals = function(path){
   
   
   # Define a border, needed in table
-  box_cols <- c("estimate_mm", "tons_km2", "tons_acre")
+  box_cols <- c("estimate_mm", "tons_km2")
   outline_border <- fp_border(color = "red", width = 1.5)   
   
   # Build flextable
@@ -548,7 +548,7 @@ table_erosion_totals = function(path){
                               "Statistics (mm/month)",
                               "",
                               "mm/yr",
-                              "tonnes/km2/yr",
+                              "tonnes/km²/yr",
                               "tons/acre/yr"),
                    colwidths = c(4, # adds up to total number of cols
                                  4,
@@ -606,7 +606,7 @@ table_erosion_totals = function(path){
     mk_par(
       j = "dt",
       value = as_paragraph(
-        as_chunk(formatC(tons_km2, format = "f", digits = 0)),
+        as_chunk(formatC(dt, format = "f", digits = 0)),
         as_chunk(" days", props = fp_text(color = "grey50", font.size = 8))
       )
     ) %>%
@@ -677,7 +677,7 @@ table_erosion_totals = function(path){
                  "estimate" = "Estimate",
                  "std_error" = "SE",
                  "p_value" = "p-value",
-                 "dt" = "Total days",
+                 "dt" = "Study Days",
                  "estimate_mm" = "Estimate",
                  "std_error_mm" = "SE",
                  "tons_km2" = "Estimate",
@@ -694,7 +694,7 @@ table_erosion_totals = function(path){
   path2 = "_plot_outputs/erosion_totals.png"
   save_as_image(erosion_units_ft, path = path2)
   
-  return(erosion_units_ft)
+  return(path2)
   
 }
 
@@ -856,25 +856,61 @@ plot_mm_dt = function(path){
 
 
 
-#================================ Figure 2 ================================
+#================================ Figure 1 ================================
 
 #' [Test code]
 # space = tar_read(all_plots); time = tar_read(plot_mmdt)
 
-build_fig2 = function(space, time){
+build_fig1 = function(space, time){
   
   divider <- ggdraw() + 
-    draw_line(x = c(0.05, 0.95), y = c(0.5, 0.5), color = "black", size = 0.5)
+    draw_line(x = c(0.05, 0.95), y = c(0.5, 0.5), color = "black", linewidth = 0.5)
   
-  fig2 = plot_grid(space, divider, time,
+  fig1 = plot_grid(space, divider, time,
             rel_heights = c(1, 0.1, 1),
             ncol = 1,
             labels = c("A)", "", "B)"),
             label_size = 14)
   
-  ggsave("_plot_outputs/figure_2.png", fig2, bg = "white", width = 9, height = 12)
+  ggsave("_plot_outputs/figure_1.png", fig1, bg = "white", width = 9, height = 12)
+
   
-  return(fig2)
+  return(fig1)
   
 }
+
+
+#================================ Figure 2 ================================
+
+#' [Test code]
+# erosion_totals = tar_read(erosion_totals_ft)
+# figure_2b = "_inputs/figure_2b.png"
+
+build_fig2 = function(erosion_totals, figure_2b){
+  
+  panel_a <- ggdraw() + draw_image(erosion_totals)
+  panel_b <- ggdraw() + draw_image(figure_2b)
+
+  fig2 = plot_grid(panel_a, panel_b,
+                   rel_heights = c(1,  1),
+                   ncol = 1,
+                   labels = c("A)", "B)"),
+                   label_size = 12)
+  
+  ggsave("_plot_outputs/figure_2.png", fig2, bg = "white", width = 9, height = 7)
+  
+  
+  return(fig2)
+}
+
+
+
+
+
+
+
+
+
+
+
 

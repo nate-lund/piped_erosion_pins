@@ -806,7 +806,7 @@ plot_mm_dt = function(path){
     #coord_cartesian(ylim = c(-20, 20)) +   # May cut off some outliers, fine for visualization
     
     scale_y_continuous( 
-      name = "log Height (mm)",
+      name = "Height (mm)",
       trans = scales::pseudo_log_trans(sigma = 1, base = 10),
       breaks = c(-35, -10, -5, -1, 0, 1, 5, 10, 35)
     ) +

@@ -269,10 +269,10 @@ frame_mmdt = function(path){
 #' [Test code]
 # frame = tar_read(mms_frame)
 
-table_mm_dt = function(frame){
+table_mmdt = function(frame){
   
   # Remove duplicated forest names
-  H3_final_table.df <- H3_final_table.df %>%
+  H3_final_table.df <- frame %>%
     mutate(forest = as.character(forest)) %>%
     group_by(forest) %>%
     mutate(forest = ifelse(row_number() == 1, forest, "")) %>%
@@ -430,8 +430,15 @@ table_mm_dt = function(frame){
                  #"p.value_slope.5" = "p-value"
       ))
   
-  H3_mm_over_time.ft
   
+  path = "_plot_outputs/erosion_mmdt.svg"
+  save_as_image(H3_mm_over_time.ft, path = path)
+  
+  path2 = "_plot_outputs/erosion_mmdt.png"
+  save_as_image(H3_mm_over_time.ft, path = path2)
+  
+  return(path2)
+
 }
 
 

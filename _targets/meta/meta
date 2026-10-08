@@ -3,29 +3,7 @@ cdfs|pattern|31dbd60cf404bb42|0d260f17cbbb0ef2||-1083873008||||1637376|file|loca
 slope_extracted|pattern|ee28ca73d35f4ebd|b8d00e03e031d8f4||-1785201348||||12522|rds|local|vector||slope_extracted_3ec53da55a645a85*slope_extracted_d85dd1aad079ed34*slope_extracted_7d0f38ebb2c3231a*slope_extracted_ade62be95181540b*slope_extracted_80409a4a775b9eca*slope_extracted_a9227a4e0becc29a|0.38||
 lsplines|stem|25b384e2c66f7e70|a00869249b5b658e|f8d9f4958ae2fb9d|2104690896|_stats_outputs/fit_data.xlsx|t20668.8132387474s|s126665b|126665|file|local|vector|||0.43||
 erosion_totals_units|stem|0c311b2a0fbe04ea|b85a62304068103d|10f04d13140c4b9e|19133857|_stats_outputs/erosion_totals.xlsx|t20670.6232696557s|s7164b|7164|file|local|vector|||0.08||
-mms_frame|stem|79a0f2d8929604b7|887e944e7e946adc|3d0dcd8528aad349|-1626745210||t20691.8406273124s|s1131b|1131|rds|local|vector|||0.06||
 figure_2b|stem|534718d5c581591e|fa94ecd03479859a|2c530c1562a7fbd1|-1763659516|_inputs/figure_2b.png|t20696.6193910825s|s997822b|997822|file|local|vector|||0||
-libs|object|b99f1c7abbfae843
-extract_slope|function|cbe8d3e2b41b2a39
-plot_each|function|961d967a672caece
-table_mm_dt|function|5f0eaadc4387a7cc
-convert_units|function|322a9210c8772a7a
-fit_lspines|function|355b76368dc260a8
-build_fig1|function|965cfa55e13b1047
-build_fig2|function|921bca234971e414
-overall_transect_stats|function|5dc1234bbe7e1266
-roc_slopepos_stats|function|6fa811ebe81c352e
-pull_dems|function|9e1ba69db3e0c93b
-table_erosion_totals|function|dae7933748c86e29
-.Random.seed|object|3f14380372ec50e1
-data_cleanup|function|d79879436e6511c9
-installed_libs|object|e7e462f09e785605
-plot_all|function|ca44bfc36dd6fe1a
-plot_mm_dt|function|3faf9eb96ef8f194
-differenced_QAQC|function|f144e471472b7d80
-frame_mmdt|function|f49233ef6e026a83
-pull_measurements|function|59074c5bb72e6d89
-difference_pins|function|e5f261d0445a7192
 baumann_bd|stem|949f78b84d32d98d|b296c45ea852b6b4|2c530c1562a7fbd1|-745379454||t20696.6683055902s|s2174b|2174|rds|local|vector|||0.06||
 raw_measurements|stem|f508fdb93866b16d|a5e23416759498e8|772e94265eb61bdb|687031044||t20696.6683072256s|s9174b|9174|rds|local|vector|||0.09||
 points|stem|fb5b12beaee2f99b|696286237179cc80|2c530c1562a7fbd1|-1464275451||t20696.6683175707s|s2641b|2641|rds|local|vector|||0.84||
@@ -33,7 +11,6 @@ find_data|stem|974ac6cb985e2a01|7e72c91c3f1a5fd9|2c530c1562a7fbd1|-1994645127||t
 clean_data|stem|ffc69b18d3f445bf|5c1b9602784f1070|291684a38e4de87f|-259385813||t20696.668318773s|s13639b|13639|rds|local|vector|||0.04||
 cdf_paths|stem|c5fd4d3885964781|b4f83f22aa94c561|011af2d1e1143e52|453561794||t20696.6690676707s|s104b|104|rds|local|vector|||64.68||
 differenced_pins|stem|0d0a6fecfaef4e0d|bfaf30c2620a9dd1|3085020e187b675f|-845012127||t20696.6691101267s|s17352b|17352|rds|local|vector|||3.64||
-cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20696.6691107619s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
 QAQC|stem|07655b99a2ab8e62|6466e5d4d64d37a4|12dd1a890b3bbccc|-1364406783||t20696.6691184218s|s383049b|383049|rds|local|vector|||0.46||
 cdfs_8e57bf1e601b7b00|branch|71f685be045e9648|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1588869013|_topo_outputs/topo-output_LRE.nc|t20696.668455858s|s272896b|272896|file|local|vector|cdfs||0||
 cdfs_b7478143786146b3|branch|c331813facae9319|0d260f17cbbb0ef2|2c530c1562a7fbd1|-2131718022|_topo_outputs/topo-output_LRW.nc|t20696.6685781303s|s272896b|272896|file|local|vector|cdfs||0||
@@ -42,7 +19,6 @@ cdfs_9478f58669e9cc26|branch|9cd59d710aa9eb22|0d260f17cbbb0ef2|2c530c1562a7fbd1|
 cdfs_e12e104faeb3de2e|branch|b49531a518d6dc0d|0d260f17cbbb0ef2|2c530c1562a7fbd1|-703814438|_topo_outputs/topo-output_WD.nc|t20696.6689438319s|s272896b|272896|file|local|vector|cdfs||0||
 cdfs_ba4b258d9d80cc1d|branch|dc72848c73c20100|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1916800234|_topo_outputs/topo-output_ASH.nc|t20696.6690676598s|s272896b|272896|file|local|vector|cdfs||0||
 transect_overall|stem|c136678eb99ba558|c339e4d3f6dd5a24|b1c6627c579a4081|-1379839151||t20696.6691228582s|s1202b|1202|rds|local|vector|||0.3||
-plot_mmdt|stem|eefecafab4bec58d|d5601df21d0c23b7|f16e7afa3cc87e26|-626711285||t20696.669165745s|s965617b|965617|rds|local|vector|||3.25|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
 slope_pos_roc|stem|3e4e6588096cb61f|9021c06df9211070|68dff5d1636e6070|1931267301||t20696.6691677755s|s556b|556|rds|local|vector|||0.14||
 points_plus_mms|stem|89af50375f27342e|c4d990246c8f5eec|ee40e3ba1e225ed4|-1002162867||t20696.6691679924s|s3308b|3308|rds|local|vector|||0||
 indv_plots_3ec53da55a645a85|branch|7fc0872f5e650a47|94c0f25332d8f045|f0e717500861d76b|-262423925||t20696.6691919417s|s2107494b|2107494|rds|local|list|indv_plots||0.75|attribute variables are assumed to be spatially constant throughout all geometries|
@@ -62,4 +38,30 @@ erosion_totals_ft|stem|751795332bf88baa|9575051c6928dfe9|35fe1594a8721b3e|122097
 all_plots|stem|dddb0ec7020428b8|19f8fe7fed37a86f|342970650777dc4e|785210724||t20696.6696527771s|s20939228b|20939228|rds|local|vector|||3.83||
 points_mms_slope|stem|49d847e7baf9cd0e|cc9429c0ad7c2de1|013d2b96df24268c|-546996876||t20696.6696539835s|s4594b|4594|rds|local|vector|||0.01||
 figure2|stem|a653faa987b3a912|585a68a474002b56|a7766e4651428b40|-415812717||t20696.6698454026s|s30073071b|30073071|rds|local|vector|||1.03||
-figure1|stem|c9d98ae278952f2f|b9716b2017335b44|7004e5701037921d|-598071735||t20696.6701329769s|s25173816b|25173816|rds|local|vector|||2.41|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
+table_mm_dt|function|c8de2aa021bcc9d1
+plot_mmdt|stem|d0ce4758c0b8ed25|d5601df21d0c23b7|6f11199181eea003|-626711285||t20727.704439s|s965916b|965916|rds|local|vector|||1.8|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
+mms_frame|stem|79a0f2d8929604b7|887e944e7e946adc|3d0dcd8528aad349|-1626745210||t20727.7044400263s|s1131b|1131|rds|local|vector|||0.06||
+figure1|stem|dcdfd4c854c16204|b9716b2017335b44|f25e2549689d3c48|-598071735||t20727.7046065389s|s25172994b|25172994|rds|local|vector|||2.09|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
+libs|object|b99f1c7abbfae843
+extract_slope|function|cbe8d3e2b41b2a39
+plot_each|function|961d967a672caece
+convert_units|function|322a9210c8772a7a
+fit_lspines|function|355b76368dc260a8
+build_fig1|function|965cfa55e13b1047
+build_fig2|function|921bca234971e414
+overall_transect_stats|function|5dc1234bbe7e1266
+roc_slopepos_stats|function|6fa811ebe81c352e
+pull_dems|function|9e1ba69db3e0c93b
+table_erosion_totals|function|dae7933748c86e29
+.Random.seed|object|93ceda3779107c26
+data_cleanup|function|d79879436e6511c9
+installed_libs|object|e7e462f09e785605
+plot_all|function|ca44bfc36dd6fe1a
+table_mmdt|function|b9422e0c91e56483
+plot_mm_dt|function|00b6263541ac145a
+differenced_QAQC|function|f144e471472b7d80
+frame_mmdt|function|f49233ef6e026a83
+pull_measurements|function|59074c5bb72e6d89
+difference_pins|function|e5f261d0445a7192
+mms_table|stem||6ac55b60dec04da5|913ab465a5d4ef9e|-1144763312||t20727.7044149526s||0|file|local|vector|||0.03||object 'mms_df' not found
+cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20727.7076625733s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||

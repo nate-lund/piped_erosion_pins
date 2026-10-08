@@ -187,19 +187,20 @@ list(
     table_erosion_totals(erosion_totals_units),
     format = "file" # Saved as an .png, so need this.
   ),
-  
+
   ### Make df for mms over time ====
-  # tar_target(
-  #   mms_frame,
-  #   frame_mmdt(lsplines)
-  # ),
-  
-  ### Make flextable for mms over time 
-  # tar_target(
-  #   mms_table,
-  #   table_mmdt(mms_df)
-  # ),
-  
+  tar_target(
+    mms_frame,
+    frame_mmdt(lsplines)
+  ),
+
+  ### Make flextable for mms over time
+  tar_target(
+    mms_table,
+    table_mmdt(mms_frame),
+    format = "file"
+  ),
+
   ### Build Figure 1 ====
   tar_target(
     figure1,

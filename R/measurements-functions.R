@@ -141,189 +141,249 @@ differenced_QAQC = function(data3) {
   return(perform_list)
 }
 
-#================================ STATS testing ================================
-# Fit a lm to each individual pin to address auto coorelation. 
+#================================ Model Approach 2 ================================
 
 #' [Test code]
 # data = tar_read(differenced_pins)
 
-fit_pin_lm = function(data){
+fit_models_a2 = function(data){
   
-
-
-#'===========================================================================
-# Overall Statistical Approach 1
-#'===========================================================================
-
-# Split. Create a list where each item is a data frame with all the measurements of each pin 
-nindex <- length(unique(data$index)) # Number of unique pins
-pin_list <- vector(mode = "list", length = nindex) # Create empty list
-for(i in 1:nindex) { # For loop to split apart the main dataframe
-  pin_list[[i]] <- data %>% filter(index == i)
+  #'===========================================================================
+  # Overall Statistical Approach 1
+  #'===========================================================================
+  
+  # Split. Create a list where each item is a data frame with all the measurements of each pin 
+  nindex <- length(unique(data$index)) # Number of unique pins
+  pin_list <- vector(mode = "list", length = nindex) # Create empty list
+  for(i in 1:nindex) { # For loop to split apart the main dataframe
+    pin_list[[i]] <- data %>% filter(index == i)
+  }
+  
+  # Fit an lm and save coefs for each pin
+  for(i in 1:nindex){
+    
+    # Fit lm to mm
+    fit = lm(data = pin_list[[i]], mm ~ t + 0) # replace with mm ~ t to unfix at zero
+    
+    # Add prediction and rate of change columns
+    pin_list[[i]]$pin_roc = as.numeric(tidy(fit)[1, "estimate"]) # in mm/day
+    pin_list[[i]]$pin_predic = predict(fit)
+    
+    # Rejoin data frames
+    ifelse(i == 1,
+           data_out <- pin_list[[i]],
+           data_out <- merge(data_out, pin_list[[i]], all = TRUE))
+    
+  }
+  
+  # Aggregate transect information into one df
+  transects <- aggregate(data = data_out,
+                         FUN = mean,
+                         pin_roc ~ forest + transect + slope_pos)
+  
+  
+  # Perform 3 t-tests
+  # Create a list of forests for the analysis
+  forests = unique(transects$forest)
+  # Create a df to hold coefs
+  coefs = data.frame(forest = forests,
+                     BS_estimate = NA,
+                     BS_pvalue = NA,
+                     FS_estimate = NA,
+                     FS_pvalue = NA,
+                     BF_estimate = NA,
+                     BF_pvalue = NA)
+  
+  # For loop to apply tests 
+  for(i in 1:length(forests)){
+    
+    # Filter for first forest
+    foresti = forests[i]
+    
+    # Split BS and FS data
+    bs = transects %>% filter(forest == foresti &
+                                slope_pos == "BS") 
+    fs = transects %>% filter(forest == foresti &
+                                slope_pos == "FS") 
+    
+    # Perform tests
+    bstest = t.test(bs$pin_roc, alternative = c("two.sided"))
+    fstest = t.test(fs$pin_roc, alternative = c("two.sided"))
+    bftest = t.test(bs$pin_roc, fs$pin_roc, alternative = c("two.sided"), paired = TRUE)
+    
+    coefs[i,2:7] = c(tidy(bstest)[c("estimate", "p.value")],
+                     tidy(fstest)[c("estimate", "p.value")],
+                     tidy(bftest)[c("estimate", "p.value")])
+    
+    
+  }
+  
+  # Pivot
+  coefs_out <- coefs %>%
+    pivot_longer(
+      cols = -forest,
+      names_to = c("slope_pos", ".value"),
+      names_sep = "_"
+    )
+  
+  # Export to _stats_outputs
+  path = "_stats_outputs/approach2_coefs.xlsx"
+  write_xlsx(coefs_out, path) # Coefs
+  
+  return(coefs_out)
 }
 
-# Fit an lm and save coefs for each pin
-for(i in 1:nindex){
+#================================ Model Approach 1 ================================
+
+#' [Test code]
+# data = tar_read(differenced_pins)
+
+fit_models_a1 = function(data){
   
-  # Fit lm to mm
-  fit = lm(data = pin_list[[i]], mm ~ t + 0) # replace with mm ~ t to unfix at zero
+  #'===========================================================================
+  # Overall Statistical Approach 2
+  #'===========================================================================
   
-  # Add prediction and rate of change columns
-  pin_list[[i]]$pin_roc = as.numeric(tidy(fit)[1, "estimate"]) # in mm/day
-  pin_list[[i]]$pin_predic = predict(fit)
+  #' [Test code]
+  # data = tar_read(differenced_pins)
   
-  # Rejoin data frames
-  ifelse(i == 1,
-         data_out <- pin_list[[i]],
-         data_out <- merge(data_out, pin_list[[i]], all = TRUE))
+  # Create a unique array ID for each array within a forest. Pins are clustered
+  # in these arrays.
+  data2 = data %>% 
+    mutate(array_ID = paste(transect, slope_pos, sep = "_"))
   
-}
-
-# Aggregate transect information into one df
-transects <- aggregate(data = data_out,
-                             FUN = mean,
-                             pin_roc ~ forest + transect + slope_pos)
-
-
-# Perform 3 t-tests to answer the following questions:
-# 1. Is the BS rate different from zero?
-# 2. Is the FS rate different from zero?   
-# 3. Do BS and FS differ?
-
-# Create a list of forests for the analysis
-forests = unique(transects$forest)
-# Create a df to hold coefs
-coefs = data.frame(forest = forests,
-                   BS_estimate = NA,
-                   BS_pvalue = NA,
-                   FS_estimate = NA,
-                   FS_pvalue = NA,
-                   BF_estimate = NA,
-                   BF_pvalue = NA)
-
-# For loop to apply tests 
-for(i in 1:length(forests)){
-  
-  # Filter for first forest
-  foresti = forests[i]
-  
-  # Split BS and FS data
-  bs = transects %>% filter(forest == foresti &
-                              slope_pos == "BS") 
-  fs = transects %>% filter(forest == foresti &
-                              slope_pos == "FS") 
-  
-  # Perform tests
-  bstest = t.test(bs$pin_roc, alternative = c("two.sided"))
-  fstest = t.test(fs$pin_roc, alternative = c("two.sided"))
-  bftest = t.test(bs$pin_roc, fs$pin_roc, alternative = c("two.sided"), paired = TRUE)
-  
-  coefs[i,2:7] = c(tidy(bstest)[c("estimate", "p.value")],
-                tidy(fstest)[c("estimate", "p.value")],
-                tidy(bftest)[c("estimate", "p.value")])
-  
-  tidy(bstest)[c("estimate", "p.value")]
-  
-}
-
-tibble(coefs)
-
-
-
-#'===========================================================================
-# Overall Statistical Approach 2
-#'===========================================================================
-
-
-data = tar_read(differenced_pins)
-
-# Create a unique array ID for each array within a forest. Pins are clustered
-# in these arrays.
-data2 = data %>% 
-  mutate(array_ID = as.numeric(factor((paste(transect, slope_pos, sep = "_")))))
-
-# Create a list of forests
-forests = unique(data2$forest)
-
-
-
-
-# For loop to perform lmers
-for(i in 1:length(forests)){
-  
-  # Filter for forest i
-  datai = datai %>% 
-    filter(forest == forests[i])
-  
-  # Fit a mixed effects model to determine BS and FS rate of change and significance
-  lmer_rates <- lmer(data = datai, REML = FALSE,
-                     mm ~ 0 + slope_pos:t
-                     + (0 + t | index)
-                     + (0 + t | array_ID)
-  )
-  # Generate predictions for plotting
-  datai$lmer_predic <- predict(lmer_rates, re.form = NA)
-  
-  # Fit a mixed effects model to determine BS and FS difference
-  lmer_diff <- lmer(data = datai, REML = FALSE,
-                    mm ~ 0 + t + t:slope_pos
-                    + (0 + t | index)
-                    + (0 + t | array_ID)
-  )
+  # Create a list of forests
+  forests = unique(data2$forest)
   
   
-  # Fit mixed effects model with a spline
-  # Note: this throws an error, but its probably okay. It does not quite converge
-  # but this is probably due to the spline / relatively small slope compared to
-  # the measurement error
-  knots = unique(datai$t)[2:(length(forests)-1)] # Set knots at measurement days
-  lmer_spline <- lmer(data = datai, REML = FALSE,
-                      mm ~ 0 + slope_pos:lspline(t, knots = knots)
+  
+  # For loop to fit models
+  for(i in 1:length(forests)){
+    
+    # Filter for forest i
+    datai = data2 %>% 
+      filter(forest == forests[i])
+    
+    # Fit a mixed effects model to determine BS and FS rate of change and significance
+    lmer_rates <- lmer(data = datai, REML = TRUE,
+                       mm ~ 0 + slope_pos:t
+                       + (0 + t | index)
+                       + (0 + t | array_ID)
+    )
+    
+    
+    # Fit a mixed effects model to determine BS and FS difference
+    lmer_diff <- lmer(data = datai, REML = TRUE,
+                      mm ~ 0 + t + t:slope_pos
                       + (0 + t | index)
-                      + (0 + t | array_ID))
-  # Generate lspine predictions (for plotting)
-  datai$ls_predic <- predict(lmer_spline, re.form = NA)
-  
-  
-  confint(lmer_rates)#
-  tidy(lmer_rates)[c(1,2), c("estimate", "p.value")] #also need confidence intervals???
-  tidy(lmer_diff)["estimate", "p.value"]
-  tidy(lmer_spline)["estimate", "p.value"]
-
-  
-  ggplot(data = datai) +
-    geom_line(mapping = aes(x  = t, y= lmer_predic, group = slope_pos))
-  
-  # Generating Best Linear Unbiased Predictions (BLUPs) for b1i and b1k
-  # print(tidy(lmer_rates, effects="ran_vals"), n = 50)
-  
-  # Generating BLUPS for overall slope predication (B + b)
-  coef(fit_mixed)
-  # Hmmm this is needed for the DEM plot, WIP
-  
-  
+                      + (0 + t | array_ID)
+    )
+    
+    
+    # Fit mixed effects model with a spline
+    knots = unique(datai$t)[2:(length(forests)-1)] # Set knots at measurement days
+    lmer_spline <- lmer(data = datai, REML = TRUE,
+                        mm ~ 0 + slope_pos:lspline(t, knots = knots)
+                        + (0 + t | index)
+                        + (0 + t | array_ID))
+    
+    # Because of the optimization error, we should double check to ensure it found
+    # a correct fit. Likely a false alarm
+    #af <- allFit(lmer_spline)
+    #summary(af)$fixef      # Period rates across optimizers
+    #summary(af)$llik       # Log-likelihoods across optimizers
+    
+    
+    # Perform an anova to test if the rate of change did vary significantly
+    # between time periods. Refits the models as ML vs REML
+    lmer_anova_coefs = tidy(anova(lmer_rates, lmer_spline))
+    
+    
+    #' [Exporting data]
+    
+    # Saving anova coefs
+    lmer_anova_coefs$forest = unique(datai$forest) # Add forest column
+    
+    ifelse(i == 1,
+           anova_out <- lmer_anova_coefs,
+           anova_out <- merge(anova_out, lmer_anova_coefs, all = TRUE)) # Merge data frames
+    
+    # Saving datai
+    datai$ls_predic <- predict(lmer_spline, re.form = NA) # Generate predictiions
+    datai$lmer_predic <- predict(lmer_rates, re.form = NA)
+    
+    ifelse(i == 1,
+           data_out <- datai,
+           data_out <- merge(data_out, datai, all = TRUE)) # Merge data frames
+    
+    # 
+    tidy(lmer_spline)
+    
+    # Saving coefs
+    # Pull coefs from lmer_rates
+    coefs_rates = tidy(lmer_rates) %>%
+      filter(term == "slope_posBS:t" | term == "slope_posFS:t") %>% 
+      mutate(
+        slope_pos = case_when(
+          term == "slope_posBS:t" ~ "BS",
+          term == "slope_posFS:t" ~ "FS"
+        )
+      ) %>% 
+      select("slope_pos", "estimate", "std.error", "p.value") %>% 
+      rename(forest_est = estimate,
+             forest_err = std.error,
+             forest_pval = p.value)
+    
+    
+    # Pull p-value from from lmer_diff
+    coefs_diff = tidy(lmer_diff) %>%
+      filter(term == "t:slope_posBS") %>% 
+      select("p.value") %>% 
+      mutate(slope_pos = "BS") %>% 
+      rename(bsfs_pval = p.value)
+    
+    # Generating BLUPS for array slope predication (B + b)
+    blups = coef(lmer_rates)$array_ID %>% 
+      tibble::rownames_to_column("array") %>% 
+      mutate(
+        slope_pos = sub(".*_", "", array),
+        transect = sub("_.*", "", array),
+        deviation = t,
+        fixed = if_else(slope_pos == "BS", `slope_posBS:t`, `slope_posFS:t`),
+        array_est = fixed + deviation,
+        forest = unique(datai$forest)
+      ) %>% 
+      select(forest, transect, slope_pos, array_est)
+    
+    
+    # Combine coefficients
+    coefs = full_join(blups, coefs_rates, by = "slope_pos") %>% 
+      full_join(coefs_diff, by = "slope_pos")
+   
+    ifelse(i == 1,
+           coefs_out <- coefs,
+           coefs_out <- merge(coefs_out, coefs, all = TRUE)) # Merge data frames
+    
+    
     
   }  
-
-
-
-
-
-
-
-
-
-
-
-# Compare model outputs
-modelsummary(list("Naive linear model" = fit.naive, 
-                  "Linear model fit to averages" = fit.avg, 
-                  "Mixed-effects model" = fit.mixed),
-             gof_omit = ".*", estimate  = "{estimate} ({std.error})", statistic=NULL,  
-             coef_omit = "SD")
-
-
+ 
+  
+  # Write to _stats_output
+  anova_path = "_stats_outputs/anova_coefs.xlsx"
+  write_xlsx(anova_out, anova_path) # Anova
+  
+  coefs_path = "_stats_outputs/approach1_coefs.xlsx"
+  write_xlsx(coefs_out, coefs_path) # Coefficients
+  
+  data_path = "_stats_outputs/approach1_data.xlsx"
+  write_xlsx(data_out, data_path) # Data
+  
+  return(list(coefs_path, data_path, anova_path))
+   
 }
+
+
 
 #================================ Fit lsplines to MMs ================================
 

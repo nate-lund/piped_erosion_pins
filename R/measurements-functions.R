@@ -239,25 +239,20 @@ fit_models_a2 = function(data){
 # data = tar_read(differenced_pins)
 
 fit_models_a1 = function(data){
-  
-  #'===========================================================================
-  # Overall Statistical Approach 2
-  #'===========================================================================
-  
-  #' [Test code]
-  # data = tar_read(differenced_pins)
+
+  # Setup
   
   # Create a unique array ID for each array within a forest. Pins are clustered
   # in these arrays.
   data2 = data %>% 
     mutate(array_ID = paste(transect, slope_pos, sep = "_"))
-  
   # Create a list of forests
   forests = unique(data2$forest)
   
   
   
-  # For loop to fit models
+  
+  # Fit models
   for(i in 1:length(forests)){
     
     # Filter for forest i
@@ -296,13 +291,13 @@ fit_models_a1 = function(data){
     
     # Perform an anova to test if the rate of change did vary significantly
     # between time periods. Refits the models as ML vs REML
-    lmer_anova_coefs = tidy(anova(lmer_rates, lmer_spline))
+    anova_coefs = tidy(anova(lmer_rates, lmer_spline))
     
     
     #' [Exporting data]
     
     # Saving anova coefs
-    lmer_anova_coefs$forest = unique(datai$forest) # Add forest column
+    anova_coefs$forest = unique(datai$forest) # Add forest column
     
     ifelse(i == 1,
            anova_out <- lmer_anova_coefs,

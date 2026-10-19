@@ -57,8 +57,8 @@ list(
   ### Pull erosion pin measurement data ====
   tar_target(
     raw_measurements,
-    list.files("_inputs/_measurements", full.names = TRUE),
-    cue = tar_cue(mode = "always")
+    read_excel(path = list.files("_inputs/_measurements", full.names = TRUE),
+               sheet = "Sheet1")
   ),
   
   ### Clean up erosion pin data ====
@@ -79,6 +79,12 @@ list(
     differenced_QAQC(differenced_pins)
   ),
   
+  ### Fit stats models (approach 1) ==== 
+  tar_target(
+    a1_model_outs, # Stored as a list of file paths: coefs_path, data_path, anova_path, spline_path
+    fit_models_a1(differenced_pins)
+  ),
+  
   ### Fil lslpines to pins ====
   tar_target(
     lsplines,
@@ -89,7 +95,7 @@ list(
   ### Plot mms over time for each forests ====
   tar_target(
     plot_mmdt,
-    plot_mm_dt(lsplines)
+    plot_mm_dt(a1_model_outs)
   ),
   
   ### Compute overall change (mm) by transect ====
@@ -108,7 +114,8 @@ list(
   ### Pull Baumann et al. 2025 data ====
   tar_target(
     baumann_bd,
-    read_excel("C:/Users/natha/Box/_data/_outside_data/Baumenn-et-al_BD-values.xlsx")
+    read_excel(path = list.files("_inputs/_bd", full.names = TRUE),
+               sheet = "DataTAB")
   ),
   
   ### Compute back of envelope unit computations using Baumann et al. data ====

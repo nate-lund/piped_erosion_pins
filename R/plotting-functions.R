@@ -708,11 +708,11 @@ table_erosion_totals = function(path){
 #================================ Plot dmm/dt ================================
 
 #' [Test code]
-# path <- "_stats_outputs/fit_data.xlsx"
+# path <- tar_read(a1_model_outs)
 
 plot_mm_dt = function(path){
   
-  data = read_excel(path)
+  data = read_excel(path[[2]])
   
   # Need to make a index column for plotting
   plot_data = data %>% 
@@ -722,10 +722,7 @@ plot_mm_dt = function(path){
                                      sep = "_"),
            # To ensure propoer ordering for facet_wrap
            forest = factor(forest, levels = c("ASH", "LRW", "LRE", "MAG", "WD", "LRJ")),
-           
-           # A Catagorical signifigance column
-           signif = ifelse(p.value <= 0.05, "Y", "N"),
-           
+
            worms = case_when(
              worms == "EW" ~ "European Earthworm Dominated",
              worms == "JW" ~ "Jumping Worm Dominated"
@@ -735,45 +732,64 @@ plot_mm_dt = function(path){
            
     )
   
+  # For making vertical lines in the plot
+  knot_df <- plot_data %>%
+    filter(!is.na(ls_predic)) %>%
+    arrange(worms, forest, index, t) %>%
+    group_by(worms, forest, index) %>%
+    mutate(
+      slope = (ls_predic - lag(ls_predic)) / (t - lag(t)),
+      kink  = row_number() == 1 | row_number() == n() |
+        abs(lead(slope) - slope) > 1e-8
+    ) %>%
+    filter(kink) %>%
+    ungroup() %>%
+    distinct(worms, forest, date) %>%
+    mutate(date = as.Date(date))
   
-  ggplot <- ggplot(data = plot_data, mapping = aes(x = date, y = mm)) +
+  
+  ggplot = ggplot(data = plot_data, mapping = aes(x = date, y = mm)) +
     
     
     # Plot reference lines
     geom_hline(yintercept = c(-35, -10, -5, -1, 0, 1, 5, 10, 35), color = "grey80", linewidth = 0.3) + 
     geom_hline(yintercept = 0, linewidth = 0.5) + # Plot line at y = 0
+    geom_vline(data = knot_df,
+               aes(xintercept = date),
+               linetype = "dashed",
+               color = "grey40",
+               linewidth = 0.4) +
     
     # Plot the lines tracking each pin, color by slope position
     geom_line(aes(group = index,
                   color =  slope_pos),
               linetype = 1,
-              alpha = 0.5) +
-    
-    # Plot boxplots for each forest and slope position
-    geom_boxplot(aes(group = forest_date,
-                     width = 3,
-                     fill = slope_pos
-    ),
-    alpha = 1) +
+              alpha = 0.3) +
     
     # Plot lspline fits
     geom_line(
       aes(x = date,
-          y = predic,
-          linetype = slope_pos),
-      linewidth = 0.8) +
+          y = ls_predic,
+          linetype = slope_pos,
+          color =  slope_pos),
+      linewidth = 0.9) +
     
+    # Plot boxplots for each forest and slope position
+    # geom_boxplot(aes(group = forest_date,
+    #                  width = 3,
+    #                  fill = slope_pos
+    # ),
+    # alpha = 1) +
     
-    # Plot a lm over the whole period for only the BS
-    geom_smooth(
-      data = plot_data %>% filter(slope_pos == "BS"),
-      aes(group = slope_pos,
+    # Plot a lm over the whole period
+    geom_line(
+      #data = plot_data %>% filter(slope_pos == "BS"),
+      aes(x = date,
+          y = lmer_predic,
           linetype = slope_pos),
-      method = "lm",
-      se = FALSE,
-      fullrange = TRUE,
       linewidth = 1.2,
-      color = "grey10") +
+      color = "black") +
+    
     
     # Facet by forest using a ggh4x pacakge function
     facet_nested_wrap(

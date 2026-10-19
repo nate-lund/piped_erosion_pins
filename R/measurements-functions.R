@@ -1,6 +1,7 @@
 #================================ Pull measurements ================================
 
 pull_measurements = function(path, sheet){
+  path = list.files(path, full.names = TRUE)
   xls = read_excel(path, sheet = sheet)
   return(xls)
 }
@@ -227,10 +228,10 @@ fit_models_a2 = function(data){
     )
   
   # Export to _stats_outputs
-  path = "_stats_outputs/approach2_coefs.xlsx"
+  coefs_path = "_stats_outputs/approach2_coefs.xlsx"
   write_xlsx(coefs_out, path) # Coefs
   
-  return(coefs_out)
+  return(coefs_path)
 }
 
 #================================ Model Approach 1 ================================
@@ -241,15 +242,11 @@ fit_models_a2 = function(data){
 fit_models_a1 = function(data){
 
   # Setup
-  
-  # Create a unique array ID for each array within a forest. Pins are clustered
-  # in these arrays.
+  # Create a unique array ID for each array within a forest
   data2 = data %>% 
     mutate(array_ID = paste(transect, slope_pos, sep = "_"))
   # Create a list of forests
   forests = unique(data2$forest)
-  
-  
   
   
   # Fit models
@@ -289,20 +286,54 @@ fit_models_a1 = function(data){
     #summary(af)$llik       # Log-likelihoods across optimizers
     
     
+    # Organize data
+    
+    #' [ANOVA]
     # Perform an anova to test if the rate of change did vary significantly
     # between time periods. Refits the models as ML vs REML
     anova_coefs = tidy(anova(lmer_rates, lmer_spline))
-    
-    
-    #' [Exporting data]
     
     # Saving anova coefs
     anova_coefs$forest = unique(datai$forest) # Add forest column
     
     ifelse(i == 1,
-           anova_out <- lmer_anova_coefs,
-           anova_out <- merge(anova_out, lmer_anova_coefs, all = TRUE)) # Merge data frames
+           anova_out <- anova_coefs,
+           anova_out <- merge(anova_out, anova_coefs, all = TRUE)) # Merge data frames
     
+    
+    
+    
+    #' [lmer spline] 
+    # Re-label tidy outpul
+    dates = unique(datai$date) # Grab measurement dates
+    spline_coefs = tidy(lmer_spline) %>% 
+      # Search for slope position
+      mutate(
+        forest = unique(datai$forest),
+        slope_pos = case_when(
+          grepl("slope_posBS", term) ~ "BS",
+          grepl("slope_posFS", term) ~ "FS",
+          TRUE ~ NA
+        ),
+      # Relabel segmetns by dates
+      period = case_when(
+        grepl("knots)1", term) ~ paste(dates[1], dates[2], sep="_"),
+        grepl("knots)2", term) ~ paste(dates[2], dates[3], sep="_"),
+        grepl("knots)3", term) ~ paste(dates[3], dates[4], sep="_"),
+        grepl("knots)4", term) ~ paste(dates[4], dates[5], sep="_"),
+        grepl("knots)5", term) ~ paste(dates[5], dates[6], sep="_"),
+        TRUE ~ NA
+        )
+      ) %>% 
+      filter(effect == "fixed") %>% 
+      select(forest, slope_pos, period, estimate, std.error, p.value)
+    
+    ifelse(i == 1,
+           spline_out <- spline_coefs,
+           spline_out <- merge(spline_out, spline_coefs, all = TRUE)) # Merge data frames
+
+    
+    #' [lmer rate & diff]
     # Saving datai
     datai$ls_predic <- predict(lmer_spline, re.form = NA) # Generate predictiions
     datai$lmer_predic <- predict(lmer_rates, re.form = NA)
@@ -310,10 +341,7 @@ fit_models_a1 = function(data){
     ifelse(i == 1,
            data_out <- datai,
            data_out <- merge(data_out, datai, all = TRUE)) # Merge data frames
-    
-    # 
-    tidy(lmer_spline)
-    
+
     # Saving coefs
     # Pull coefs from lmer_rates
     coefs_rates = tidy(lmer_rates) %>%
@@ -361,20 +389,23 @@ fit_models_a1 = function(data){
     
     
     
-  }  
+  }
  
   
   # Write to _stats_output
-  anova_path = "_stats_outputs/anova_coefs.xlsx"
-  write_xlsx(anova_out, anova_path) # Anova
-  
   coefs_path = "_stats_outputs/approach1_coefs.xlsx"
-  write_xlsx(coefs_out, coefs_path) # Coefficients
+  write_xlsx(coefs_out, coefs_path) # Overall coefficients
   
   data_path = "_stats_outputs/approach1_data.xlsx"
   write_xlsx(data_out, data_path) # Data
   
-  return(list(coefs_path, data_path, anova_path))
+  anova_path = "_stats_outputs/anova_coefs.xlsx"
+  write_xlsx(anova_out, anova_path) # Anova
+  
+  spline_path = "_stats_outputs/spline_coefs.xlsx"
+  write_xlsx(spline_out, spline_path) # Spline fit
+  
+  return(list(coefs_path, data_path, anova_path, spline_path))
    
 }
 

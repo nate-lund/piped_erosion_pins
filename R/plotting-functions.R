@@ -708,7 +708,7 @@ table_erosion_totals = function(path){
 #================================ Plot dmm/dt ================================
 
 #' [Test code]
-# path <- tar_read(a1_model_outs)
+# path <- tar_read(a1_model_outs); path2 <- tar_read(a1_model_outs)[[4]]
 
 plot_mm_dt = function(path){
   
@@ -731,6 +731,23 @@ plot_mm_dt = function(path){
            
            
     )
+  
+  # Prepare for signifigance
+  seg_sig = read_excel(path2) %>%
+    separate_wider_delim(period, delim = "_", names = c("start", "end")) %>%
+    mutate(
+      start  = ymd(start),
+      end    = ymd(end),
+      date   = start + (end - start) / 2,         # segment midpoint
+      forest = factor(forest, levels = levels(plot_data$forest)),
+      stars  = case_when(p.value < 0.001 ~ "***",
+                         p.value < 0.01  ~ "**",
+                         p.value < 0.05  ~ "*",
+                         TRUE            ~ ""),
+      vj     = if_else(slope_pos == "BS", -1.3, -0.1)   # BS row above FS row
+    ) %>%
+    left_join(distinct(plot_data, forest, worms), by = "forest")
+  
   
   ggplot = ggplot(data = plot_data, mapping = aes(x = date, y = mm)) +
     
@@ -760,6 +777,13 @@ plot_mm_dt = function(path){
                      fill = slope_pos
     ),
     alpha = 1) +
+    
+    # Add aignifigance stars
+    geom_text(
+      data = seg_sig,
+      aes(x = date, y = -Inf, label = stars, color = slope_pos, vjust = vj),
+      size = 5, show.legend = FALSE, inherit.aes = FALSE
+    ) +
     
     # Plot a lm over the whole period
     geom_line(
@@ -793,8 +817,8 @@ plot_mm_dt = function(path){
     scale_fill_manual(
       name = "Slope Position",
       values = c(
-        "FS" = "royalblue2",
-        "BS" = "indianred2"
+        "FS" = "royalblue3",
+        "BS" = "indianred3"
       )) +
     
     # Plot some dummy points - this is just to get outliers in the legend 
@@ -808,10 +832,11 @@ plot_mm_dt = function(path){
     
     #coord_cartesian(ylim = c(-20, 20)) +   # May cut off some outliers, fine for visualization
     
-    scale_y_continuous( 
+    scale_y_continuous(
       name = "Height (mm)",
       trans = scales::pseudo_log_trans(sigma = 1, base = 10),
-      breaks = c(-35, -10, -5, -1, 0, 1, 5, 10, 35)
+      breaks = c(-35, -10, -5, -1, 0, 1, 5, 10, 35),
+      expand = expansion(mult = c(0.15, 0.05))
     ) +
     
     scale_x_date(limits = c(ymd("2025-07-10"), ymd("2025-10-01")),
@@ -852,7 +877,7 @@ plot_mm_dt = function(path){
     ) 
   
   
-  ggsave("_plot_outputs/mms_plot.png", ggplot, width = 9, height = 6, dpi = 900)
+  ggsave("_plot_outputs/mms_plot.png", ggplot, width = 9, height = 8, dpi = 900)
   
   return(ggplot)
 }

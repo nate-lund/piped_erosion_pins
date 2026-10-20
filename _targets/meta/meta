@@ -1,6 +1,5 @@
 name|type|data|command|depend|seed|path|time|size|bytes|format|repository|iteration|parent|children|seconds|warnings|error
 cdfs|pattern|31dbd60cf404bb42|0d260f17cbbb0ef2||-1083873008||||1637376|file|local|vector||cdfs_8e57bf1e601b7b00*cdfs_b7478143786146b3*cdfs_a1c7eeafe12b3b76*cdfs_9478f58669e9cc26*cdfs_e12e104faeb3de2e*cdfs_ba4b258d9d80cc1d|0||
-slope_extracted|pattern|ee28ca73d35f4ebd|b8d00e03e031d8f4||-1785201348||||12522|rds|local|vector||slope_extracted_3ec53da55a645a85*slope_extracted_d85dd1aad079ed34*slope_extracted_7d0f38ebb2c3231a*slope_extracted_ade62be95181540b*slope_extracted_80409a4a775b9eca*slope_extracted_a9227a4e0becc29a|0.38||
 table_mm_dt|function|c8de2aa021bcc9d1
 fit_pin_lm|function|7e5501ac21701d37
 find_data|stem|974ac6cb985e2a01|7e72c91c3f1a5fd9|2c530c1562a7fbd1|-1994645127||t20745.0304986535s|s119b|119|rds|local|vector|||0||
@@ -19,53 +18,55 @@ cdfs_a1c7eeafe12b3b76|branch|47a2ff9b5a6a84fb|0d260f17cbbb0ef2|2c530c1562a7fbd1|
 cdfs_9478f58669e9cc26|branch|9cd59d710aa9eb22|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1967445829|_topo_outputs/topo-output_MAG.nc|t20745.0310167733s|s272896b|272896|file|local|vector|cdfs||0||
 cdfs_e12e104faeb3de2e|branch|b49531a518d6dc0d|0d260f17cbbb0ef2|2c530c1562a7fbd1|-703814438|_topo_outputs/topo-output_WD.nc|t20745.0311401531s|s272896b|272896|file|local|vector|cdfs||0||
 cdfs_ba4b258d9d80cc1d|branch|dc72848c73c20100|0d260f17cbbb0ef2|2c530c1562a7fbd1|-1916800234|_topo_outputs/topo-output_ASH.nc|t20745.0312627701s|s272896b|272896|file|local|vector|cdfs||0||
-plot_mmdt|stem|cf8caa8da55f77bc|d5601df21d0c23b7|54ea56e06f0f8095|-626711285||t20745.0313690778s|s967824b|967824|rds|local|vector|||3.84|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
 slope_pos_roc|stem|3e4e6588096cb61f|9021c06df9211070|b70265d65ca840a4|1931267301||t20745.0313717924s|s556b|556|rds|local|vector|||0.18||
 transect_overall|stem|c136678eb99ba558|c339e4d3f6dd5a24|44c4ea26e92b9fa3|-1379839151||t20745.0313753758s|s1202b|1202|rds|local|vector|||0.27||
-mms_frame|stem|79a0f2d8929604b7|887e944e7e946adc|2e1a1c8e8f4376a6|-1626745210||t20745.0313765838s|s1131b|1131|rds|local|vector|||0.06||
-erosion_totals_units|stem|f88f27081dfa6074|b85a62304068103d|10f04d13140c4b9e|19133857|_stats_outputs/erosion_totals.xlsx|t20745.0313775739s|s7163b|7163|file|local|vector|||0.06||
-points_plus_mms|stem|89af50375f27342e|c4d990246c8f5eec|ee40e3ba1e225ed4|-1002162867||t20745.0313779819s|s3308b|3308|rds|local|vector|||0||
 mms_table|stem|23292386e6f12a22|5518a2c488858f27|67b77e72a9acf9a8|-1144763312|_plot_outputs/erosion_mmdt.png|t20745.0314232965s|s77805b|77805|file|local|vector|||3.89||
-erosion_totals_ft|stem|751795332bf88baa|9575051c6928dfe9|382645d5e26f6914|1220970016|_plot_outputs/erosion_totals.png|t20745.0314843192s|s167002b|167002|file|local|vector|||5.22||
-slope_extracted_3ec53da55a645a85|branch|484ce9d9e91f8398|b8d00e03e031d8f4|6ee0932c0569e628|1131929517||t20745.0314865763s|s2091b|2091|rds|local|vector|slope_extracted||0.13|attribute variables are assumed to be spatially constant throughout all geometries|
-slope_extracted_d85dd1aad079ed34|branch|61959db8274606be|b8d00e03e031d8f4|b443d8958710ec72|1049811275||t20745.0314883743s|s2086b|2086|rds|local|vector|slope_extracted||0.14|attribute variables are assumed to be spatially constant throughout all geometries|
-slope_extracted_7d0f38ebb2c3231a|branch|0cfa283177a4c878|b8d00e03e031d8f4|f330ff144b1e2184|920380597||t20745.0314892513s|s2074b|2074|rds|local|vector|slope_extracted||0.04|attribute variables are assumed to be spatially constant throughout all geometries|
-slope_extracted_ade62be95181540b|branch|1067fc941430bb3e|b8d00e03e031d8f4|18bfd163424987da|168347981||t20745.0314898649s|s2094b|2094|rds|local|vector|slope_extracted||0.05|attribute variables are assumed to be spatially constant throughout all geometries|
-slope_extracted_80409a4a775b9eca|branch|688a9a6d0c2e70d0|b8d00e03e031d8f4|d5bda85108a2a4dd|-1551916290||t20745.0314906225s|s2084b|2084|rds|local|vector|slope_extracted||0.05|attribute variables are assumed to be spatially constant throughout all geometries|
-slope_extracted_a9227a4e0becc29a|branch|c7183380ce6a8c21|b8d00e03e031d8f4|074edb3eca69ce4c|1682564471||t20745.0314911151s|s2093b|2093|rds|local|vector|slope_extracted||0.04|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_3ec53da55a645a85|branch|653fa98c0df84a15|94c0f25332d8f045|f0e717500861d76b|-262423925||t20745.031516846s|s2116848b|2116848|rds|local|list|indv_plots||0.8|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_d85dd1aad079ed34|branch|86510939a6564e97|94c0f25332d8f045|2b42709e1c0c6036|-1899512493||t20745.0315458846s|s2148281b|2148281|rds|local|list|indv_plots||0.7|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_7d0f38ebb2c3231a|branch|642ec06c02db366a|94c0f25332d8f045|702cabc6007bbf8c|-1590872505||t20745.0315701399s|s2143692b|2143692|rds|local|list|indv_plots||0.68|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_ade62be95181540b|branch|d426d6f3b5ecfb4a|94c0f25332d8f045|3701544133b9e7ca|1071516154||t20745.0315944134s|s2143446b|2143446|rds|local|list|indv_plots||0.65|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_80409a4a775b9eca|branch|d03d5687fa043fe4|94c0f25332d8f045|84271aaa8885fb2c|-276787903||t20745.0316184475s|s2140242b|2140242|rds|local|list|indv_plots||0.64|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots_a9227a4e0becc29a|branch|551683121cde15c0|94c0f25332d8f045|207fbb317ed3e8fd|913911112||t20745.0316432247s|s2150699b|2150699|rds|local|list|indv_plots||0.64|attribute variables are assumed to be spatially constant throughout all geometries|
-indv_plots|pattern|42dc257a4c0dd417|94c0f25332d8f045||183193026||||12843208|rds|local|list||indv_plots_3ec53da55a645a85*indv_plots_d85dd1aad079ed34*indv_plots_7d0f38ebb2c3231a*indv_plots_ade62be95181540b*indv_plots_80409a4a775b9eca*indv_plots_a9227a4e0becc29a|4.11||
 figure2|stem|f0329e8e99e50410|585a68a474002b56|a7766e4651428b40|-415812717||t20745.0318498634s|s30073006b|30073006|rds|local|vector|||1.31||
-points_mms_slope|stem|49d847e7baf9cd0e|cc9429c0ad7c2de1|013d2b96df24268c|-546996876||t20745.0318512244s|s4594b|4594|rds|local|vector|||0.02||
-all_plots|stem|511fb4eb2afe69c1|19f8fe7fed37a86f|1d6e8e408da1b867|785210724||t20745.0321533742s|s20978664b|20978664|rds|local|vector|||4.31||
-figure1|stem|091adea67dad9ad6|b9716b2017335b44|969ee1dcd604e535|-598071735||t20745.0324802113s|s25211599b|25211599|rds|local|vector|||2.86|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
-libs|object|a9e4cf37a4fbfe79
-extract_slope|function|cbe8d3e2b41b2a39
-plot_each|function|961d967a672caece
-convert_units|function|322a9210c8772a7a
 fit_lspines|function|bbcbba3e1a8552db
-build_fig1|function|965cfa55e13b1047
-build_fig2|function|921bca234971e414
 overall_transect_stats|function|5dc1234bbe7e1266
 roc_slopepos_stats|function|6fa811ebe81c352e
+mms_frame|stem|79a0f2d8929604b7|887e944e7e946adc|624717f9c1ba8fbb|-1626745210||t20745.0313765838s||1131|rds|local|vector|||0.02||object 'lsplines' not found
+slope_extracted_3ec53da55a645a85|branch|ce8be15897453506|b8d00e03e031d8f4|00972d94e57e5ec8|1131929517||t20745.1661953449s|s2053b|2053|rds|local|vector|slope_extracted||0.06|attribute variables are assumed to be spatially constant throughout all geometries|
+slope_extracted_d85dd1aad079ed34|branch|6161d2afe9b85984|b8d00e03e031d8f4|bd0a726516abdd43|1049811275||t20745.166196093s|s2000b|2000|rds|local|vector|slope_extracted||0.07|attribute variables are assumed to be spatially constant throughout all geometries|
+slope_extracted_7d0f38ebb2c3231a|branch|26db3fdbaf35fadd|b8d00e03e031d8f4|5907ae7af2fdfc79|920380597||t20745.1661964834s|s2050b|2050|rds|local|vector|slope_extracted||0.02|attribute variables are assumed to be spatially constant throughout all geometries|
+slope_extracted_ade62be95181540b|branch|5c45a4551dce8abb|b8d00e03e031d8f4|57f4b581596493eb|168347981||t20745.1661967827s|s2068b|2068|rds|local|vector|slope_extracted||0.02|attribute variables are assumed to be spatially constant throughout all geometries|
+slope_extracted_80409a4a775b9eca|branch|a40d8d612341d768|b8d00e03e031d8f4|2791fb4aa7e86ff8|-1551916290||t20745.1661970787s|s1998b|1998|rds|local|vector|slope_extracted||0.03|attribute variables are assumed to be spatially constant throughout all geometries|
+slope_extracted_a9227a4e0becc29a|branch|96ce192612a3ecc0|b8d00e03e031d8f4|5cacc98fc4e012f8|1682564471||t20745.1661973598s|s2067b|2067|rds|local|vector|slope_extracted||0.01|attribute variables are assumed to be spatially constant throughout all geometries|
+slope_extracted|pattern|fa04b00ecab0f650|b8d00e03e031d8f4||-1785201348||||12236|rds|local|vector||slope_extracted_3ec53da55a645a85*slope_extracted_d85dd1aad079ed34*slope_extracted_7d0f38ebb2c3231a*slope_extracted_ade62be95181540b*slope_extracted_80409a4a775b9eca*slope_extracted_a9227a4e0becc29a|0.21||
+points_mms_slope|stem|e20066f91b8b5e56|cc9429c0ad7c2de1|cf490cfa06febd9e|-546996876||t20745.1661978011s|s4266b|4266|rds|local|vector|||0.01||
+points_plus_mms|stem|c3bb21df5af73a53|bcd3427a9f87bc24|74634254acd4c60e|-1002162867||t20745.1673542036s|s2983b|2983|rds|local|vector|||0||
+indv_plots_3ec53da55a645a85|branch|ed33c649c002c8e2|94c0f25332d8f045|f9030e0c88aa207c|-262423925||t20745.170196357s|s2085840b|2085840|rds|local|list|indv_plots||0.48|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_d85dd1aad079ed34|branch|5d63b214a3f1d7dd|94c0f25332d8f045|12a91c944f6cb132|-1899512493||t20745.1702077714s|s2117582b|2117582|rds|local|list|indv_plots||0.32|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_7d0f38ebb2c3231a|branch|c18c3e94506954d5|94c0f25332d8f045|952da551dedefa38|-1590872505||t20745.1702187262s|s2113329b|2113329|rds|local|list|indv_plots||0.26|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_ade62be95181540b|branch|8a89a87bcb340f96|94c0f25332d8f045|cc90f325afbd0498|1071516154||t20745.1702301659s|s2113155b|2113155|rds|local|list|indv_plots||0.28|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_80409a4a775b9eca|branch|71a5b4529062c0a2|94c0f25332d8f045|6c7d380a88cf0a49|-276787903||t20745.1702440538s|s2110428b|2110428|rds|local|list|indv_plots||0.29|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots_a9227a4e0becc29a|branch|f67cb8dc0b489575|94c0f25332d8f045|f6250641e259cfc5|913911112||t20745.1702547967s|s2119766b|2119766|rds|local|list|indv_plots||0.3|attribute variables are assumed to be spatially constant throughout all geometries|
+indv_plots|pattern|b23dcf044dfa73fb|94c0f25332d8f045||183193026||||12660100|rds|local|list||indv_plots_3ec53da55a645a85*indv_plots_d85dd1aad079ed34*indv_plots_7d0f38ebb2c3231a*indv_plots_ade62be95181540b*indv_plots_80409a4a775b9eca*indv_plots_a9227a4e0becc29a|1.93||
+all_plots|stem|24b5c05fa6f0633d|19f8fe7fed37a86f|8379efad134f136e|785210724||t20745.170397581s|s20798312b|20798312|rds|local|vector|||1.95||
+plot_mmdt|stem|a427525888761ab1|e5d1c0941a4429d7|31ab206346a7ede2|-626711285||t20745.1757727632s|s855973b|855973|rds|local|vector|||2.04|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
+figure1|stem|6d2abb298e25c7e3|b9716b2017335b44|98d49b4eb99b09d1|-598071735||t20745.1759333233s|s24864863b|24864863|rds|local|vector|||1.9|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
+a1_model_outs|stem|c68a20f9c961e70d|6134183e2edbb9ff|0b63466fd6b4e46a|-934907244||t20746.6676768827s|s123b|123|rds|local|vector|||0.97||
+libs|object|a9e4cf37a4fbfe79
+extract_slope|function|cbe8d3e2b41b2a39
+plot_each|function|ed4e6d985d586fe4
+convert_units|function|2331c106f2daccc2
+build_fig1|function|965cfa55e13b1047
+build_fig2|function|921bca234971e414
+pin_accuracy|function|4c9a57153264e56e
 pull_dems|function|9e1ba69db3e0c93b
 table_erosion_totals|function|dae7933748c86e29
-.Random.seed|object|ff163ff261cfad09
-fit_models_a1|function|5acab97f6754638c
+.Random.seed|object|ad06cbcc4179bd31
+fit_models_a1|function|025cf7809008f123
 data_cleanup|function|d79879436e6511c9
-fit_models_a2|function|d3d818ab99c6e3f1
+fit_models_a2|function|64729586c49d0a6f
 installed_libs|object|933863c44e17ca7f
 plot_all|function|ca44bfc36dd6fe1a
 table_mmdt|function|b9422e0c91e56483
-plot_mm_dt|function|00b6263541ac145a
+plot_mm_dt|function|1cd098317f777c6f
 differenced_QAQC|function|f144e471472b7d80
 frame_mmdt|function|f49233ef6e026a83
 pull_measurements|function|5daa43931379d2e1
 difference_pins|function|181d10a8bb2c88ec
-cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20745.0568335832s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
-a1_model_outs|stem|c68a20f9c961e70d|6134183e2edbb9ff|f9dd69518968eda5|-934907244||t20745.0568452415s|s123b|123|rds|local|vector|||1|unable to evaluate scaled gradient. Model failed to converge: degenerate  Hessian with 1 negative eigenvalues   See ?lme4::convergence and ?lme4::troubleshooting.. Model failed to converge with 1 negative eigenvalue: -8.9e+00. unable to evaluate scaled gradient. Model failed to converge: degenerate  Hessian with 1 negative eigenvalues   See ?lme4::convergence and ?lme4::troubleshooting.. Model failed to converge with 1 negative eigenvalue: -8.9e+00. Model failed to converge with maxgrad = 0.00395482 (tol = 0.002, component 1)   See ?lme4::convergence and ?lme4::troubleshooting.. Model failed to converge with maxgrad = 0.00395482 (tol = 0.002, component 1)   See ?lme4::convergence and ?lme4::troubleshooting.. Model failed to converge with maxgrad = 0.0337579 (tol = 0.002, component 1)   See ?lme4::convergence and ?lme4::troubleshooting.|
+cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20746.7429784892s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
+erosion_totals_units|stem|5d0bf307ed22df0a|03d888c2cc037d4e|36c347bc60604d62|19133857|_stats_outputs/erosion_totals.xlsx|t20746.7429801127s|s7148b|7148|file|local|vector|||0.07||
+erosion_totals_ft|stem|751795332bf88baa|9575051c6928dfe9|e7292d2bee7db56e|1220970016|_plot_outputs/erosion_totals.png|t20745.0314843192s||167002|file|local|vector|||0.09||ℹ In argument: `dt = round(dt, digits = 0)`. Caused by error in `round()`: ! non-numeric argument to mathematical function

@@ -16,8 +16,8 @@ plot_each = function(points, cdfs) {
   crs(rast) <- "EPSG:32615"
   
   # Convert p_value to 0.95 signifigance Y/N
-  points = points %>%
-    mutate(signif = ifelse(p_value <= 0.05, "Y", "N"))
+  # points = points %>%
+  #   mutate(signif = ifelse(p_value <= 0.05, "Y", "N"))
   
   # Convert points dataframe to a usable sf
   pts_sf = st_as_sf(points,
@@ -52,9 +52,9 @@ plot_each = function(points, cdfs) {
   ggplot = ggplot() +
     geom_raster(data = rast_df, aes(x = x, y = y, fill = slope)) + 
     geom_sf(data = pts_sf,
-            aes(color = estimate,
-                shape = signif,
-                size = abs(estimate)),
+            aes(color = array_est * 30, # x30 for days to months
+                #shape = signif,
+                size = abs(array_est)),
             size = 3.5) +
     
     # Label slope positions
@@ -112,14 +112,14 @@ plot_each = function(points, cdfs) {
     ) +
     
     # Shape
-    scale_shape_manual(values = c("Y" = 19, "N" = 10), name = "Signifigant") +
+    #scale_shape_manual(values = c("Y" = 19, "N" = 10), name = "Signifigant") +
     
     # Point colors
     scale_color_gradientn(
       colours = c("darkmagenta", "red", "orange", "royalblue2"),
       values = scales::rescale(c(-10, -5, 0, 5)),  # must match limits/data range, scaled to 0-1
       limits = c(-10, 5),
-      name = "Δ Elevation\n(mm/month)"
+      name = "ΔElevation\n(mm/month)"
     ) +
     
     ggtitle(forest_name) +
@@ -732,33 +732,13 @@ plot_mm_dt = function(path){
            
     )
   
-  # For making vertical lines in the plot
-  knot_df <- plot_data %>%
-    filter(!is.na(ls_predic)) %>%
-    arrange(worms, forest, index, t) %>%
-    group_by(worms, forest, index) %>%
-    mutate(
-      slope = (ls_predic - lag(ls_predic)) / (t - lag(t)),
-      kink  = row_number() == 1 | row_number() == n() |
-        abs(lead(slope) - slope) > 1e-8
-    ) %>%
-    filter(kink) %>%
-    ungroup() %>%
-    distinct(worms, forest, date) %>%
-    mutate(date = as.Date(date))
-  
-  
   ggplot = ggplot(data = plot_data, mapping = aes(x = date, y = mm)) +
     
     
     # Plot reference lines
     geom_hline(yintercept = c(-35, -10, -5, -1, 0, 1, 5, 10, 35), color = "grey80", linewidth = 0.3) + 
-    geom_hline(yintercept = 0, linewidth = 0.5) + # Plot line at y = 0
-    geom_vline(data = knot_df,
-               aes(xintercept = date),
-               linetype = "dashed",
-               color = "grey40",
-               linewidth = 0.4) +
+    geom_hline(yintercept = 0, linewidth = 0.5) + # Plot line at y = 0,
+
     
     # Plot the lines tracking each pin, color by slope position
     geom_line(aes(group = index,
@@ -775,11 +755,11 @@ plot_mm_dt = function(path){
       linewidth = 0.9) +
     
     # Plot boxplots for each forest and slope position
-    # geom_boxplot(aes(group = forest_date,
-    #                  width = 3,
-    #                  fill = slope_pos
-    # ),
-    # alpha = 1) +
+    geom_boxplot(aes(group = forest_date,
+                     width = 3,
+                     fill = slope_pos
+    ),
+    alpha = 1) +
     
     # Plot a lm over the whole period
     geom_line(

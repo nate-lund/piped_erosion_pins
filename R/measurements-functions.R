@@ -42,6 +42,30 @@ data_cleanup = function(data){
   
 }
 
+#================================ Assess Measurement Accuracy ================================
+
+#' [Test code]
+# data = tar_read(clean_data)
+
+pin_accuracy = function(data){
+  # Difference subsequent measurements
+  data2 = data %>% 
+    mutate(
+      dmm_ch = abs(mm1_ch - mm2_ch)
+    )
+  
+  # See histogram of differences
+  hist(data2$dmm_ch, breaks = 30)
+  
+  # Compute mean and median
+  mean(data2$dmm_ch)
+  median(data2$dmm_ch)
+  max(data2$dmm_ch)
+  min(data2$dmm_ch)
+  sd(data2$dmm_ch)
+  
+}
+
 
 #================================ Difference Measurements ================================
 
@@ -141,106 +165,13 @@ differenced_QAQC = function(data3) {
   
   return(perform_list)
 }
-
-#================================ Model Approach 2 ================================
-
-#' [Test code]
-# data = tar_read(differenced_pins)
-
-fit_models_a2 = function(data){
-  
-  #'===========================================================================
-  # Overall Statistical Approach 1
-  #'===========================================================================
-  
-  # Split. Create a list where each item is a data frame with all the measurements of each pin 
-  nindex <- length(unique(data$index)) # Number of unique pins
-  pin_list <- vector(mode = "list", length = nindex) # Create empty list
-  for(i in 1:nindex) { # For loop to split apart the main dataframe
-    pin_list[[i]] <- data %>% filter(index == i)
-  }
-  
-  # Fit an lm and save coefs for each pin
-  for(i in 1:nindex){
-    
-    # Fit lm to mm
-    fit = lm(data = pin_list[[i]], mm ~ t + 0) # replace with mm ~ t to unfix at zero
-    
-    # Add prediction and rate of change columns
-    pin_list[[i]]$pin_roc = as.numeric(tidy(fit)[1, "estimate"]) # in mm/day
-    pin_list[[i]]$pin_predic = predict(fit)
-    
-    # Rejoin data frames
-    ifelse(i == 1,
-           data_out <- pin_list[[i]],
-           data_out <- merge(data_out, pin_list[[i]], all = TRUE))
-    
-  }
-  
-  # Aggregate transect information into one df
-  transects <- aggregate(data = data_out,
-                         FUN = mean,
-                         pin_roc ~ forest + transect + slope_pos)
-  
-  
-  # Perform 3 t-tests
-  # Create a list of forests for the analysis
-  forests = unique(transects$forest)
-  # Create a df to hold coefs
-  coefs = data.frame(forest = forests,
-                     BS_estimate = NA,
-                     BS_pvalue = NA,
-                     FS_estimate = NA,
-                     FS_pvalue = NA,
-                     BF_estimate = NA,
-                     BF_pvalue = NA)
-  
-  # For loop to apply tests 
-  for(i in 1:length(forests)){
-    
-    # Filter for first forest
-    foresti = forests[i]
-    
-    # Split BS and FS data
-    bs = transects %>% filter(forest == foresti &
-                                slope_pos == "BS") 
-    fs = transects %>% filter(forest == foresti &
-                                slope_pos == "FS") 
-    
-    # Perform tests
-    bstest = t.test(bs$pin_roc, alternative = c("two.sided"))
-    fstest = t.test(fs$pin_roc, alternative = c("two.sided"))
-    bftest = t.test(bs$pin_roc, fs$pin_roc, alternative = c("two.sided"), paired = TRUE)
-    
-    coefs[i,2:7] = c(tidy(bstest)[c("estimate", "p.value")],
-                     tidy(fstest)[c("estimate", "p.value")],
-                     tidy(bftest)[c("estimate", "p.value")])
-    
-    
-  }
-  
-  # Pivot
-  coefs_out <- coefs %>%
-    pivot_longer(
-      cols = -forest,
-      names_to = c("slope_pos", ".value"),
-      names_sep = "_"
-    )
-  
-  # Export to _stats_outputs
-  coefs_path = "_stats_outputs/approach2_coefs.xlsx"
-  write_xlsx(coefs_out, path) # Coefs
-  
-  return(coefs_path)
-}
-
 #================================ Model Approach 1 ================================
 
 #' [Test code]
 # data = tar_read(differenced_pins)
 
 fit_models_a1 = function(data){
-
+  
   # Setup
   # Create a unique array ID for each array within a forest
   data2 = data %>% 
@@ -255,6 +186,9 @@ fit_models_a1 = function(data){
     # Filter for forest i
     datai = data2 %>% 
       filter(forest == forests[i])
+    
+    # Convert t from days to months (helps with model stability, provides more interpret-able estimates)
+    datai$t <- datai$t / 30.44
     
     # Fit a mixed effects model to determine BS and FS rate of change and significance
     lmer_rates <- lmer(data = datai, REML = TRUE,
@@ -281,9 +215,11 @@ fit_models_a1 = function(data){
     
     # Because of the optimization error, we should double check to ensure it found
     # a correct fit. Likely a false alarm
-    #af <- allFit(lmer_spline)
-    #summary(af)$fixef      # Period rates across optimizers
-    #summary(af)$llik       # Log-likelihoods across optimizers
+    # af <- allFit(lmer_spline)
+    # summary(af)$fixef # Period rates across optimizers
+    # summary(af)$llik # Log-likelihoods across optimizers
+    # isSingular(lmer_rates)
+    # VarCorr(lmer_rates) # look for an SD at or near 0
     
     
     # Organize data
@@ -315,14 +251,14 @@ fit_models_a1 = function(data){
           grepl("slope_posFS", term) ~ "FS",
           TRUE ~ NA
         ),
-      # Relabel segmetns by dates
-      period = case_when(
-        grepl("knots)1", term) ~ paste(dates[1], dates[2], sep="_"),
-        grepl("knots)2", term) ~ paste(dates[2], dates[3], sep="_"),
-        grepl("knots)3", term) ~ paste(dates[3], dates[4], sep="_"),
-        grepl("knots)4", term) ~ paste(dates[4], dates[5], sep="_"),
-        grepl("knots)5", term) ~ paste(dates[5], dates[6], sep="_"),
-        TRUE ~ NA
+        # Relabel segmetns by dates
+        period = case_when(
+          grepl("knots)1", term) ~ paste(dates[1], dates[2], sep="_"),
+          grepl("knots)2", term) ~ paste(dates[2], dates[3], sep="_"),
+          grepl("knots)3", term) ~ paste(dates[3], dates[4], sep="_"),
+          grepl("knots)4", term) ~ paste(dates[4], dates[5], sep="_"),
+          grepl("knots)5", term) ~ paste(dates[5], dates[6], sep="_"),
+          TRUE ~ NA
         )
       ) %>% 
       filter(effect == "fixed") %>% 
@@ -331,7 +267,7 @@ fit_models_a1 = function(data){
     ifelse(i == 1,
            spline_out <- spline_coefs,
            spline_out <- merge(spline_out, spline_coefs, all = TRUE)) # Merge data frames
-
+    
     
     #' [lmer rate & diff]
     # Saving datai
@@ -341,7 +277,7 @@ fit_models_a1 = function(data){
     ifelse(i == 1,
            data_out <- datai,
            data_out <- merge(data_out, datai, all = TRUE)) # Merge data frames
-
+    
     # Saving coefs
     # Pull coefs from lmer_rates
     coefs_rates = tidy(lmer_rates) %>%
@@ -374,15 +310,16 @@ fit_models_a1 = function(data){
         deviation = t,
         fixed = if_else(slope_pos == "BS", `slope_posBS:t`, `slope_posFS:t`),
         array_est = fixed + deviation,
-        forest = unique(datai$forest)
+        forest = unique(datai$forest),
+        t = max(datai$t)
       ) %>% 
-      select(forest, transect, slope_pos, array_est)
+      select(forest, t, transect, slope_pos, array_est)
     
     
     # Combine coefficients
     coefs = full_join(blups, coefs_rates, by = "slope_pos") %>% 
       full_join(coefs_diff, by = "slope_pos")
-   
+    
     ifelse(i == 1,
            coefs_out <- coefs,
            coefs_out <- merge(coefs_out, coefs, all = TRUE)) # Merge data frames
@@ -390,7 +327,7 @@ fit_models_a1 = function(data){
     
     
   }
- 
+  
   
   # Write to _stats_output
   coefs_path = "_stats_outputs/approach1_coefs.xlsx"
@@ -406,200 +343,299 @@ fit_models_a1 = function(data){
   write_xlsx(spline_out, spline_path) # Spline fit
   
   return(list(coefs_path, data_path, anova_path, spline_path))
-   
+  
 }
 
 
 
-#================================ Fit lsplines to MMs ================================
+#================================ Model Approach 2 ================================
 
 #' [Test code]
-# data4 = tar_read(differenced_pins)
+# data = tar_read(differenced_pins)
 
-fit_lspines = function(data4){
+fit_models_a2 = function(data){
   
-  # Define number of forests in dataset
-  forests = unique(data4$forest)
-  nforests = length(forests) 
+  # Convert t from days to months (helps with model stability, provides more interpret-able estimates)
+  data2$t <- data$t / 30.44
   
-  # Split. Create a list where each item is a data frame with all the measurements
-  # from one forest and one hillslope position.
-  forest_list <- vector(mode = "list", length = nforests * 2) # Create empty list
-  
-  for(i in 1:nforests) { # For loop to split by forest for BS
-    forest_list[[i]] <- data4 %>%
-      filter(forest == forests[i] & slope_pos == "BS")
+  # Number of unique pins
+  indexs <- unique(data2$index)
+
+  # Fit an lm and save coefs for each pin
+  for(i in indexs){
+    
+    # Filter for an invididual pin
+    datai = data2 %>% 
+      filter(index == i)
+    
+    # Fit lm to mm
+    fit = lm(data = datai, mm ~ 0 + t) # replace with mm ~ t to unfix at zero
+    
+    # Add prediction and rate of change columns
+    datai$pin_roc = as.numeric(tidy(fit)[1, "estimate"]) # in mm/day
+    datai$pin_predic = predict(fit)
+    
+    # Rejoin data frames
+    ifelse(i == first(indexs),
+           data_out <- datai,
+           data_out <- merge(data_out, datai, all = TRUE))
+    
   }
   
-  for(i in 1:nforests) { # For loop to split by forest for FS
-    forest_list[[i + nforests]] <- data4 %>%
-      filter(forest == forests[i] & slope_pos == "FS")
-  }
   
-  
-  # For loop to fit lspline with knots at measurements dates
-  for (i in 1:(nforests * 2)){
-    # Define knot dates, do not need knots at beginning or end.
-    knots <- unique(forest_list[[i]]$date)[2:(length(unique(forest_list[[i]]$dayof))-1)] 
-    
-    # Fit lspline
-    lspline = lm(data = forest_list[[i]], mm ~ lspline(date, knots = knots))
-    
-    # Create predictions for plotting later
-    forest_list[[i]]$predic <- predict(lspline)
-    
-    ifelse(i == 1,
-           ls_data <- forest_list[[i]],
-           ls_data <- merge(ls_data, forest_list[[i]], all = TRUE)) # merge data frames
-    
-    
-    # Save model coefficients
-    coefs <- tidy(lspline) # pulls estimate, std.error, statistic, p.value
-    error <- data.frame(confint(lspline)) %>%   # grab margin of errors
-      mutate(m_error = (X97.5.. - X2.5..) / 2)
-    coefs$m_error = error$m_error # combine estimates with margin
-    
-    coefs$forest = unique(forest_list[[i]]$forest) # Add a column denoting forest
-    coefs$slope_pos = unique(forest_list[[i]]$slope_pos) # Add a column denoting slope pos
-    
-    # Add a column for dates, here the date refers to the erosion from the previous
-    # measurement period
-    coefs$date = unique(forest_list[[i]]$date)
-    
-    ifelse(i == 1,
-           all_coefs <- coefs,
-           all_coefs <- merge(all_coefs, coefs, all = TRUE)) # Merge data frames
-    
-    
-  } # End loop
-  
-  
-  # Drop intercept coefs from all_coefs
-  all_coefs = all_coefs %>% 
-    filter(term != "(Intercept)")
-  
-  # Join measuremenet data (w/ lspline predictions) with lslope coefs data frame
-  fit_data = left_join(ls_data, all_coefs, by = c("forest", "date", "slope_pos"))
-  
-  # Write to _stats_output
-  path = "_stats_outputs/fit_data.xlsx"
-  write_xlsx(fit_data, path)
-  
-  
-  return(path)
-}
-
-
-#================================ Elevation by Transect ================================
-# This is computing the total elevation change for each forest - hillslope_pos
-# Using in plotting
-
-#' [Test code]
-# path = tar_read(lsplines)
-
-overall_transect_stats = function(path){
-  
-  mms_overall_change = read_excel(path) %>% 
-  
-  # Fit linear models to get mean change of each 'array' (each forest, slope_pos, 
-  # transect combo) with summary statistics.
-    group_by(forest, slope_pos, transect) %>% 
-    
-    summarise( 
-      estimate = as.numeric(tidy(lm(mm ~ dayof))[2, "estimate"] * 30.4), # in mm/month
-      std_error = as.numeric(tidy(lm(mm ~ dayof))[2, "std.error"] * 30.4), # in mm/month
-      p_value = as.numeric(tidy(lm(mm ~ dayof))[2, "p.value"] * 30.4),
-      .groups = "drop"
-    ) %>% 
+  # Aggregate transect information into one df
+  transects = data_out %>% 
+    group_by(forest, transect, slope_pos) %>% 
+    summarise(array_roc = mean(pin_roc)) %>% 
     ungroup()
   
-  return(mms_overall_change)
-}
-
-
-#================================ Elevation ROC by Slope Pos ================================
-# This is computing the rate of elevation change for each forest - hillslope_pos 
-
-#' [Test code]
-# path = "_stats_outputs/fit_data.xlsx"
-
-roc_slopepos_stats = function(path){
-  
-  # Pull data from /_stats_outputs
-  mms_overall_change = read_excel(path)
-  
-  
-  # Create a list of forests in the dataset
-  forest_list = unique(mms_overall_change$forest)
-  
+  # Perform 3 t-tests
+  # Create a list of forests for the analysis
+  forests = unique(transects$forest)
   # Create a df to hold coefs
-  nforest = rep(NA, times = length(forest_list))
-  mms_slope_pos = data.frame(forest = nforest,
-                             #r_squared = nforest,
-                             estimate_bs = nforest,
-                             std_error_bs = nforest,
-                             p_value_bs = nforest,
-                             estimate_fs = nforest,
-                             std_error_fs = nforest,
-                             p_value_fs = nforest # Not the sig of FS, but diff
-                             ) 
+  coefs = data.frame(forest = forests,
+                     BS_estimate = NA,
+                     BS_pvalue = NA,
+                     FS_estimate = NA,
+                     FS_pvalue = NA,
+                     BF_estimate = NA,
+                     BF_pvalue = NA)
   
-
-  # For loop to fit a lm for each forest: estimate ~ date * slope_pos - 1
-  # Fit a linear model testing BS significance and whether FS is
-  # significantly different than BS.
-  for(i in 1:length(forest_list)){
-    # Filter overall dataset for only forest i data
-    data = mms_overall_change %>% 
-      filter(forest == forest_list[i])
+  # For loop to apply tests 
+  for(i in forests){
     
-    # Fit model using effects coding to produce a BS estimate representing
-    # the mean change from baseline to final measurement and an FS estimate 
-    # representing the change from the BS, also reflected in p values.
-    lm = lm(data = data, mm ~ dayof * slope_pos) # effects coding for model, add "- dayof"
+    # Split BS and FS data and select one forest
+    bs = transects %>% filter(forest == i &
+                                slope_pos == "BS") 
+    fs = transects %>% filter(forest == i &
+                                slope_pos == "FS") 
     
-    summary(lm)$adj.r.squared
+    # Perform tests
+    bstest = t.test(bs$array_roc, alternative = c("two.sided"))
+    fstest = t.test(fs$array_roc, alternative = c("two.sided"))
+    bftest = t.test(bs$array_roc, fs$array_roc, alternative = c("two.sided"), paired = TRUE)
     
-    # Build data frame using model outputs
-    mms_slope_pos[i,"forest"] = forest_list[i] # Forest column
+    # Bind together
+    coefs = bind_rows(.id = "slope_pos",
+      BS = tidy(bstest),
+      FS = tidy(fstest),
+      BF = tidy(bftest)
+      ) %>% 
+      mutate(
+        forest = unique(fs$forest)
+      ) %>% 
+      select(forest, slope_pos, estimate, statistic, p.value)
     
-    # Overall R squared
-    #mms_slope_pos[i,"r_squared"] = summary(lm)$adj.r.squared
+    ifelse(i == first(forests),
+           coefs_out <- coefs,
+           coefs_out <- merge(coefs_out, coefs, all = TRUE))
     
-    # Backslope coefs
-    mms_slope_pos[i, "estimate_bs"] = tidy(lm)[2, "estimate"] * 30.4 # mm/month
-    mms_slope_pos[i, "std_error_bs"] = tidy(lm)[2, "std.error"] * 30.4 # mm/month
-    mms_slope_pos[i, "p_value_bs"] = tidy(lm)[2, "p.value"] 
-    
-    # Footslope coefs
-    mms_slope_pos[i, "estimate_fs"] = tidy(lm)[2, "estimate"] + tidy(lm)[4, "estimate"] * 30.4 # mm/month
-    mms_slope_pos[i, "std_error_fs"] = tidy(lm)[4, "std.error"] * 30.4 # mm/month
-    mms_slope_pos[i, "p_value_fs"] = tidy(lm)[4, "p.value"]
-    
-    # Supporting columns
-     mms_slope_pos[i, "dt"] = as.numeric(max(data$date) - min(data$date), units = "days")
-
   }
   
-  # Pivot table
-  mms_slope_pos = mms_slope_pos %>%
-    pivot_longer(
-      cols = matches("_(bs|fs)$"),
-      names_to = c(".value", "type"),
-      names_pattern = "(.*)_(bs|fs)$"
-    )
+  # Pivot
+  coefs_out
   
-  return(mms_slope_pos)
+  # Export to _stats_outputs
+  coefs_path = "_stats_outputs/approach2_coefs.xlsx"
+  write_xlsx(coefs_out, path) # Coefs
+  
+  return(coefs_path)
 }
 
 
+#' #================================ Fit lsplines to MMs ================================
+#' 
+#' #' [Test code]
+#' # data4 = tar_read(differenced_pins)
+#' 
+#' fit_lspines = function(data4){
+#'   
+#'   # Define number of forests in dataset
+#'   forests = unique(data4$forest)
+#'   nforests = length(forests) 
+#'   
+#'   # Split. Create a list where each item is a data frame with all the measurements
+#'   # from one forest and one hillslope position.
+#'   forest_list <- vector(mode = "list", length = nforests * 2) # Create empty list
+#'   
+#'   for(i in 1:nforests) { # For loop to split by forest for BS
+#'     forest_list[[i]] <- data4 %>%
+#'       filter(forest == forests[i] & slope_pos == "BS")
+#'   }
+#'   
+#'   for(i in 1:nforests) { # For loop to split by forest for FS
+#'     forest_list[[i + nforests]] <- data4 %>%
+#'       filter(forest == forests[i] & slope_pos == "FS")
+#'   }
+#'   
+#'   
+#'   # For loop to fit lspline with knots at measurements dates
+#'   for (i in 1:(nforests * 2)){
+#'     # Define knot dates, do not need knots at beginning or end.
+#'     knots <- unique(forest_list[[i]]$date)[2:(length(unique(forest_list[[i]]$dayof))-1)] 
+#'     
+#'     # Fit lspline
+#'     lspline = lm(data = forest_list[[i]], mm ~ lspline(date, knots = knots))
+#'     
+#'     # Create predictions for plotting later
+#'     forest_list[[i]]$predic <- predict(lspline)
+#'     
+#'     ifelse(i == 1,
+#'            ls_data <- forest_list[[i]],
+#'            ls_data <- merge(ls_data, forest_list[[i]], all = TRUE)) # merge data frames
+#'     
+#'     
+#'     # Save model coefficients
+#'     coefs <- tidy(lspline) # pulls estimate, std.error, statistic, p.value
+#'     error <- data.frame(confint(lspline)) %>%   # grab margin of errors
+#'       mutate(m_error = (X97.5.. - X2.5..) / 2)
+#'     coefs$m_error = error$m_error # combine estimates with margin
+#'     
+#'     coefs$forest = unique(forest_list[[i]]$forest) # Add a column denoting forest
+#'     coefs$slope_pos = unique(forest_list[[i]]$slope_pos) # Add a column denoting slope pos
+#'     
+#'     # Add a column for dates, here the date refers to the erosion from the previous
+#'     # measurement period
+#'     coefs$date = unique(forest_list[[i]]$date)
+#'     
+#'     ifelse(i == 1,
+#'            all_coefs <- coefs,
+#'            all_coefs <- merge(all_coefs, coefs, all = TRUE)) # Merge data frames
+#'     
+#'     
+#'   } # End loop
+#'   
+#'   
+#'   # Drop intercept coefs from all_coefs
+#'   all_coefs = all_coefs %>% 
+#'     filter(term != "(Intercept)")
+#'   
+#'   # Join measuremenet data (w/ lspline predictions) with lslope coefs data frame
+#'   fit_data = left_join(ls_data, all_coefs, by = c("forest", "date", "slope_pos"))
+#'   
+#'   # Write to _stats_output
+#'   path = "_stats_outputs/fit_data.xlsx"
+#'   write_xlsx(fit_data, path)
+#'   
+#'   
+#'   return(path)
+#' }
+#' 
+#' #================================ Elevation by Transect ================================
+#' # This is computing the total elevation change for each forest - hillslope_pos
+#' # Using in plotting
+#' 
+#' #' [Test code]
+#' # path = tar_read(lsplines)
+#' 
+#' overall_transect_stats = function(path){
+#' 
+#'   mms_overall_change = read_excel(path) %>%
+#' 
+#'   # Fit linear models to get mean change of each 'array' (each forest, slope_pos,
+#'   # transect combo) with summary statistics.
+#'     group_by(forest, slope_pos, transect) %>%
+#' 
+#'     summarise(
+#'       estimate = as.numeric(tidy(lm(mm ~ dayof))[2, "estimate"] * 30.4), # in mm/month
+#'       std_error = as.numeric(tidy(lm(mm ~ dayof))[2, "std.error"] * 30.4), # in mm/month
+#'       p_value = as.numeric(tidy(lm(mm ~ dayof))[2, "p.value"] * 30.4),
+#'       .groups = "drop"
+#'     ) %>%
+#'     ungroup()
+#' 
+#'   return(mms_overall_change)
+#' }
+#' 
+
+#' #================================ Elevation ROC by Slope Pos ================================
+#' # This is computing the rate of elevation change for each forest - hillslope_pos 
+#' 
+#' #' [Test code]
+#' # path = "_stats_outputs/fit_data.xlsx"
+#' 
+#' roc_slopepos_stats = function(path){
+#'   
+#'   # Pull data from /_stats_outputs
+#'   mms_overall_change = read_excel(path)
+#'   
+#'   
+#'   # Create a list of forests in the dataset
+#'   forest_list = unique(mms_overall_change$forest)
+#'   
+#'   # Create a df to hold coefs
+#'   nforest = rep(NA, times = length(forest_list))
+#'   mms_slope_pos = data.frame(forest = nforest,
+#'                              #r_squared = nforest,
+#'                              estimate_bs = nforest,
+#'                              std_error_bs = nforest,
+#'                              p_value_bs = nforest,
+#'                              estimate_fs = nforest,
+#'                              std_error_fs = nforest,
+#'                              p_value_fs = nforest # Not the sig of FS, but diff
+#'                              ) 
+#'   
+#' 
+#'   # For loop to fit a lm for each forest: estimate ~ date * slope_pos - 1
+#'   # Fit a linear model testing BS significance and whether FS is
+#'   # significantly different than BS.
+#'   for(i in 1:length(forest_list)){
+#'     # Filter overall dataset for only forest i data
+#'     data = mms_overall_change %>% 
+#'       filter(forest == forest_list[i])
+#'     
+#'     # Fit model using effects coding to produce a BS estimate representing
+#'     # the mean change from baseline to final measurement and an FS estimate 
+#'     # representing the change from the BS, also reflected in p values.
+#'     lm = lm(data = data, mm ~ dayof * slope_pos) # effects coding for model, add "- dayof"
+#'     
+#'     summary(lm)$adj.r.squared
+#'     
+#'     # Build data frame using model outputs
+#'     mms_slope_pos[i,"forest"] = forest_list[i] # Forest column
+#'     
+#'     # Overall R squared
+#'     #mms_slope_pos[i,"r_squared"] = summary(lm)$adj.r.squared
+#'     
+#'     # Backslope coefs
+#'     mms_slope_pos[i, "estimate_bs"] = tidy(lm)[2, "estimate"] * 30.4 # mm/month
+#'     mms_slope_pos[i, "std_error_bs"] = tidy(lm)[2, "std.error"] * 30.4 # mm/month
+#'     mms_slope_pos[i, "p_value_bs"] = tidy(lm)[2, "p.value"] 
+#'     
+#'     # Footslope coefs
+#'     mms_slope_pos[i, "estimate_fs"] = tidy(lm)[2, "estimate"] + tidy(lm)[4, "estimate"] * 30.4 # mm/month
+#'     mms_slope_pos[i, "std_error_fs"] = tidy(lm)[4, "std.error"] * 30.4 # mm/month
+#'     mms_slope_pos[i, "p_value_fs"] = tidy(lm)[4, "p.value"]
+#'     
+#'     # Supporting columns
+#'      mms_slope_pos[i, "dt"] = as.numeric(max(data$date) - min(data$date), units = "days")
+#' 
+#'   }
+#'   
+#'   # Pivot table
+#'   mms_slope_pos = mms_slope_pos %>%
+#'     pivot_longer(
+#'       cols = matches("_(bs|fs)$"),
+#'       names_to = c(".value", "type"),
+#'       names_pattern = "(.*)_(bs|fs)$"
+#'     )
+#'   
+#'   return(mms_slope_pos)
+#' }
+#' 
+#' 
 
 #================================ Erosion Totals (Units) ================================
 
 #' [Test Code]
-# slope_pos_roc = tar_read(slope_pos_roc); bd = tar_read(baumann_bd)
+# path = tar_read(a1_model_outs)[[1]]; bd = tar_read(baumann_bd)
 
-convert_units = function(slope_pos_roc, bd){
+convert_units = function(path, bd){
+  
+  # Pull measurement averages, "agreagate" by forest/slope_pos
+  data = read_excel(path) %>% 
+    filter(transect == "central") %>% 
+    select(-transect, -array_est)
   
   # Compute a mean of the bd for the top 5cm, relevant to erosion, for each
   # earthworm species
@@ -623,16 +659,16 @@ convert_units = function(slope_pos_roc, bd){
     
   
   # Clean up lm coefficients
-  erosion_df = slope_pos_roc %>%
+  erosion_df = data %>%
     
     # Create a mm column from estimate
     mutate(
-      estimate_mm = estimate / 30.4 * dt,
-      std_error_mm = std_error / 30.4 * dt,
+      estimate_mm = forest_est * t,
+      std_error_mm = forest_err * t,
     
     # Add worms columns
       worms = case_when(
-        forest %in% c("ASH", "LRE", "LRW", "AREF", "LREF") ~ "EW",
+        forest %in% c("ASH", "LRE", "LRW") ~ "EW",
         forest %in% c("MAG", "WD", "LRJ") ~ "JW"
       )
     ) 

@@ -85,31 +85,31 @@ list(
     fit_models_a1(differenced_pins)
   ),
   
-  ### Fil lslpines to pins ====
-  tar_target(
-    lsplines,
-    fit_lspines(differenced_pins),
-    format = "file"
-  ),
-  
+  #' ### Fil lslpines to pins ====
+  # tar_target(
+  #   lsplines,
+  #   fit_lspines(differenced_pins),
+  #   format = "file"
+  # ),
+
   ### Plot mms over time for each forests ====
   tar_target(
     plot_mmdt,
     plot_mm_dt(a1_model_outs)
   ),
   
-  ### Compute overall change (mm) by transect ====
-  # This is used for plotting
-  tar_target(
-    transect_overall,
-    overall_transect_stats(lsplines)
-  ),
-  
-  ### Compute overall rate of change (mm/day) by slope_pos ====
-  tar_target(
-    slope_pos_roc,
-    roc_slopepos_stats(lsplines)
-  ),
+  #' ### Compute overall change (mm) by transect ====
+  # # This is used for plotting
+  # tar_target(
+  #   transect_overall,
+  #   overall_transect_stats(lsplines)
+  # ),
+  # 
+  #' ### Compute overall rate of change (mm/day) by slope_pos ====
+  # tar_target(
+  #   slope_pos_roc,
+  #   roc_slopepos_stats(lsplines)
+  # ),
   
   ### Pull Baumann et al. 2025 data ====
   tar_target(
@@ -121,7 +121,7 @@ list(
   ### Compute back of envelope unit computations using Baumann et al. data ====
   tar_target(
     erosion_totals_units,
-    convert_units(slope_pos_roc, baumann_bd),
+    convert_units(a1_model_outs[[1]], baumann_bd),
     format = "file" # Saved as an .xlxs, so need this.
   ),
   
@@ -156,7 +156,8 @@ list(
   ### Combine point (GPS) data and measurement data ====
   tar_target(
     points_plus_mms,
-    left_join(transect_overall, points, by = c("forest", "transect", "slope_pos"))
+    full_join(read_excel(a1_model_outs[[1]]),
+              points, by = c("forest", "transect", "slope_pos"))
   ),
   
   ### Extract slope at each point ====
@@ -196,18 +197,18 @@ list(
     format = "file" # Saved as an .png, so need this.
   ),
 
-  ### Make df for mms over time ====
-  tar_target(
-    mms_frame,
-    frame_mmdt(lsplines)
-  ),
-
-  ### Make flextable for mms over time
-  tar_target(
-    mms_table,
-    table_mmdt(mms_frame),
-    format = "file"
-  ),
+  #' ### Make df for mms over time ====
+  # tar_target(
+  #   mms_frame,
+  #   frame_mmdt(lsplines)
+  # ),
+  # 
+  #' ### Make flextable for mms over time
+  # tar_target(
+  #   mms_table,
+  #   table_mmdt(mms_frame),
+  #   format = "file"
+  # ),
 
   ### Build Figure 1 ====
   tar_target(

@@ -734,16 +734,20 @@ plot_mm_dt = function(path){
   
   # Prepare for signifigance
   seg_sig = read_excel(path2) %>%
+    # Split date column
     separate_wider_delim(period, delim = "_", names = c("start", "end")) %>%
+    # Create stars column 
     mutate(
       start  = ymd(start),
       end    = ymd(end),
-      date   = start + (end - start) / 2,         # segment midpoint
+      date   = start + (end - start) / 2, # Define segment midpoint
       forest = factor(forest, levels = levels(plot_data$forest)),
-      stars  = case_when(p.value < 0.001 ~ "***",
-                         p.value < 0.01  ~ "**",
-                         p.value < 0.05  ~ "*",
-                         TRUE            ~ ""),
+      stars  = case_when(
+        p.value < 0.001 ~ "***",
+        p.value < 0.01 ~ "**",
+        p.value < 0.05  ~ "*",
+        p.value < 0.1  ~ "-",
+        TRUE            ~ ""),
       vj     = if_else(slope_pos == "BS", -1.3, -0.1)   # BS row above FS row
     ) %>%
     left_join(distinct(plot_data, forest, worms), by = "forest")

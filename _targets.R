@@ -95,7 +95,7 @@ list(
   ### Plot mms over time for each forests ====
   tar_target(
     plot_mmdt,
-    plot_mm_dt(a1_model_outs)
+    plot_mm_dt(a1_model_outs[[2]], a1_model_outs[[4]])
   ),
   
   #' ### Compute overall change (mm) by transect ====

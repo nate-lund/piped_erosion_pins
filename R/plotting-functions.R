@@ -710,9 +710,9 @@ table_erosion_totals = function(path){
 #' [Test code]
 # path <- tar_read(a1_model_outs); path2 <- tar_read(a1_model_outs)[[4]]
 
-plot_mm_dt = function(path){
+plot_mm_dt = function(path, path2){
   
-  data = read_excel(path[[2]])
+  data = read_excel(path)
   
   # Need to make a index column for plotting
   plot_data = data %>% 
@@ -765,7 +765,7 @@ plot_mm_dt = function(path){
     geom_line(aes(group = index,
                   color =  slope_pos),
               linetype = 1,
-              alpha = 0.3) +
+              alpha = 0.2) +
     
     # Plot lspline fits
     geom_line(

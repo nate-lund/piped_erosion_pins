@@ -888,52 +888,52 @@ plot_mm_dt = function(path, path2){
 
 
 
-#================================ Figure 1 ================================
+#' #================================ Figure 1 ================================
+#' 
+#' #' [Test code]
+#' # space = tar_read(all_plots); time = tar_read(plot_mmdt)
+#' 
+#' build_fig1 = function(space, time){
+#'   
+#'   divider <- ggdraw() + 
+#'     draw_line(x = c(0.05, 0.95), y = c(0.5, 0.5), color = "black", linewidth = 0.5)
+#'   
+#'   fig1 = plot_grid(space, divider, time,
+#'             rel_heights = c(1, 0.1, 1),
+#'             ncol = 1,
+#'             labels = c("A)", "", "B)"),
+#'             label_size = 14)
+#'   
+#'   ggsave("_plot_outputs/figure_1.png", fig1, bg = "white", width = 9, height = 12)
+#' 
+#'   
+#'   return(fig1)
+#'   
+#' }
 
-#' [Test code]
-# space = tar_read(all_plots); time = tar_read(plot_mmdt)
 
-build_fig1 = function(space, time){
-  
-  divider <- ggdraw() + 
-    draw_line(x = c(0.05, 0.95), y = c(0.5, 0.5), color = "black", linewidth = 0.5)
-  
-  fig1 = plot_grid(space, divider, time,
-            rel_heights = c(1, 0.1, 1),
-            ncol = 1,
-            labels = c("A)", "", "B)"),
-            label_size = 14)
-  
-  ggsave("_plot_outputs/figure_1.png", fig1, bg = "white", width = 9, height = 12)
-
-  
-  return(fig1)
-  
-}
-
-
-#================================ Figure 2 ================================
-
-#' [Test code]
-# erosion_totals = tar_read(erosion_totals_ft)
-# figure_2b = "_inputs/figure_2b.png"
-
-build_fig2 = function(erosion_totals, figure_2b){
-  
-  panel_a <- ggdraw() + draw_image(erosion_totals)
-  panel_b <- ggdraw() + draw_image(figure_2b)
-
-  fig2 = plot_grid(panel_a, panel_b,
-                   rel_heights = c(1,  1),
-                   ncol = 1,
-                   labels = c("A)", "B)"),
-                   label_size = 12)
-  
-  ggsave("_plot_outputs/figure_2.png", fig2, bg = "white", width = 9, height = 7)
-  
-  
-  return(fig2)
-}
+#' #================================ Figure 2 ================================
+#' 
+#' #' [Test code]
+#' # erosion_totals = tar_read(erosion_totals_ft)
+#' # figure_2b = "_inputs/figure_2b.png"
+#' 
+#' build_fig2 = function(erosion_totals, figure_2b){
+#'   
+#'   panel_a <- ggdraw() + draw_image(erosion_totals)
+#'   panel_b <- ggdraw() + draw_image(figure_2b)
+#' 
+#'   fig2 = plot_grid(panel_a, panel_b,
+#'                    rel_heights = c(1,  1),
+#'                    ncol = 1,
+#'                    labels = c("A)", "B)"),
+#'                    label_size = 12)
+#'   
+#'   ggsave("_plot_outputs/figure_2.png", fig2, bg = "white", width = 9, height = 7)
+#'   
+#'   
+#'   return(fig2)
+#' }
 
 
 

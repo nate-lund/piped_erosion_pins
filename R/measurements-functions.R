@@ -175,7 +175,9 @@ fit_models_a1 = function(data){
   # Setup
   # Create a unique array ID for each array within a forest
   data2 = data %>% 
-    mutate(array_ID = paste(transect, slope_pos, sep = "_"))
+    mutate(array_ID = paste(transect, slope_pos, sep = "_"),
+           # Convert t from days to months (helps with model stability, provides more interpret-able estimates)
+           t = t / 30.44) 
   # Create a list of forests
   forests = unique(data2$forest)
   
@@ -186,9 +188,6 @@ fit_models_a1 = function(data){
     # Filter for forest i
     datai = data2 %>% 
       filter(forest == forests[i])
-    
-    # Convert t from days to months (helps with model stability, provides more interpret-able estimates)
-    datai$t <- datai$t / 30.44
     
     # Fit a mixed effects model to determine BS and FS rate of change and significance
     lmer_rates <- lmer(data = datai, REML = TRUE,
@@ -356,7 +355,8 @@ fit_models_a1 = function(data){
 fit_models_a2 = function(data){
   
   # Convert t from days to months (helps with model stability, provides more interpret-able estimates)
-  data2$t <- data$t / 30.44
+  data2 = data %>% 
+    mutate(t = (t / 30.44))
   
   # Number of unique pins
   indexs <- unique(data2$index)
@@ -424,7 +424,7 @@ fit_models_a2 = function(data){
       mutate(
         forest = unique(fs$forest)
       ) %>% 
-      select(forest, slope_pos, estimate, statistic, p.value)
+      select(forest, slope_pos, estimate, statistic, p.value, method)
     
     ifelse(i == first(forests),
            coefs_out <- coefs,
@@ -432,14 +432,15 @@ fit_models_a2 = function(data){
     
   }
   
-  # Pivot
-  coefs_out
   
   # Export to _stats_outputs
-  coefs_path = "_stats_outputs/approach2_coefs.xlsx"
-  write_xlsx(coefs_out, path) # Coefs
+  forest_path = "_stats_outputs/approach2_forest.xlsx"
+  write_xlsx(coefs_out, forest_path) # Coefs
   
-  return(coefs_path)
+  array_path = "_stats_outputs/approach2_array.xlsx"
+  write_xlsx(transects, array_path) # Coefs
+  
+  return(list(forest_path, array_path))
 }
 
 
@@ -702,12 +703,14 @@ convert_units = function(path, bd){
     
       
       # Compute erosion in imperial ton/acre
-      tons_acre = tons_km2 / 2.47105 * 0.984207 / 100,
+      #tons_acre = tons_km2 / 2.47105 * 0.984207 / 100,
       
         # Compute SE
-      tons_acre_se = tons_km2_se / 2.47105 * 0.984207 / 100,
+     # tons_acre_se = tons_km2_se / 2.47105 * 0.984207 / 100,
       
-           )
+           ) %>% 
+    
+    select(forest, slope_pos, estimate_mm, std_error_mm, tons_km2, tons_km2_se)
   
   # Write to _stats_output
   path = "_stats_outputs/erosion_totals.xlsx"

@@ -43,21 +43,22 @@ indv_plots_80409a4a775b9eca|branch|71a5b4529062c0a2|94c0f25332d8f045|6c7d380a88c
 indv_plots_a9227a4e0becc29a|branch|f67cb8dc0b489575|94c0f25332d8f045|f6250641e259cfc5|913911112||t20745.1702547967s|s2119766b|2119766|rds|local|list|indv_plots||0.3|attribute variables are assumed to be spatially constant throughout all geometries|
 indv_plots|pattern|b23dcf044dfa73fb|94c0f25332d8f045||183193026||||12660100|rds|local|list||indv_plots_3ec53da55a645a85*indv_plots_d85dd1aad079ed34*indv_plots_7d0f38ebb2c3231a*indv_plots_ade62be95181540b*indv_plots_80409a4a775b9eca*indv_plots_a9227a4e0becc29a|1.93||
 all_plots|stem|24b5c05fa6f0633d|19f8fe7fed37a86f|8379efad134f136e|785210724||t20745.170397581s|s20798312b|20798312|rds|local|vector|||1.95||
-a1_model_outs|stem|c68a20f9c961e70d|6134183e2edbb9ff|0b63466fd6b4e46a|-934907244||t20746.6676768827s|s123b|123|rds|local|vector|||0.97||
-erosion_totals_units|stem|5d0bf307ed22df0a|03d888c2cc037d4e|36c347bc60604d62|19133857|_stats_outputs/erosion_totals.xlsx|t20746.7429801127s|s7148b|7148|file|local|vector|||0.07||
+plot_mmdt|stem|5b953498fe606948|a748b10f0b695b41|78d6779428d754d0|-626711285||t20748.7913798784s|s872207b|872207|rds|local|vector|||1.9|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
+figure1|stem|d26fa844d0bb3f00|b9716b2017335b44|b3c9a5fae8d60fa0|-598071735||t20748.7915425806s|s24905408b|24905408|rds|local|vector|||1.86|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
+build_fig1|function|965cfa55e13b1047
+build_fig2|function|921bca234971e414
+erosion_totals_ft|stem|751795332bf88baa|9575051c6928dfe9|28b418a70e34dccf|1220970016|_plot_outputs/erosion_totals.png|t20745.0314843192s||167002|file|local|vector|||0.08||ℹ In argument: `dt = round(dt, digits = 0)`. Caused by error in `round()`: ! non-numeric argument to mathematical function
 libs|object|a9e4cf37a4fbfe79
 extract_slope|function|cbe8d3e2b41b2a39
 plot_each|function|ed4e6d985d586fe4
-convert_units|function|2331c106f2daccc2
-build_fig1|function|965cfa55e13b1047
-build_fig2|function|921bca234971e414
+convert_units|function|4791414614400d16
 pin_accuracy|function|4c9a57153264e56e
 pull_dems|function|9e1ba69db3e0c93b
 table_erosion_totals|function|dae7933748c86e29
-.Random.seed|object|6bf680fae91860ba
-fit_models_a1|function|025cf7809008f123
+.Random.seed|object|ad100357b212323c
+fit_models_a1|function|131e2c917718c4e0
 data_cleanup|function|d79879436e6511c9
-fit_models_a2|function|64729586c49d0a6f
+fit_models_a2|function|cf2c07a12bd133f9
 installed_libs|object|933863c44e17ca7f
 plot_all|function|ca44bfc36dd6fe1a
 table_mmdt|function|b9422e0c91e56483
@@ -66,7 +67,7 @@ differenced_QAQC|function|f144e471472b7d80
 frame_mmdt|function|f49233ef6e026a83
 pull_measurements|function|5daa43931379d2e1
 difference_pins|function|181d10a8bb2c88ec
-cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20748.791355267s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
-plot_mmdt|stem|5b953498fe606948|a748b10f0b695b41|78d6779428d754d0|-626711285||t20748.7913798784s|s872207b|872207|rds|local|vector|||1.9|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
-erosion_totals_ft|stem|751795332bf88baa|9575051c6928dfe9|e7292d2bee7db56e|1220970016|_plot_outputs/erosion_totals.png|t20745.0314843192s||167002|file|local|vector|||0.09||ℹ In argument: `dt = round(dt, digits = 0)`. Caused by error in `round()`: ! non-numeric argument to mathematical function
-figure1|stem|d26fa844d0bb3f00|b9716b2017335b44|b3c9a5fae8d60fa0|-598071735||t20748.7915425806s|s24905408b|24905408|rds|local|vector|||1.86|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
+cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20749.8871514289s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
+a1_model_outs|stem|c68a20f9c961e70d|6134183e2edbb9ff|08e9d4f7f3ab9356|-934907244||t20749.8871659766s|s123b|123|rds|local|vector|||1.22||
+a2_model_outs|stem|f4f515bdc58271f4|8a2cff7a8c7bca18|6e5feff35108aa08|1598635696||t20749.8871949844s|s105b|105|rds|local|vector|||2.47||
+erosion_totals_units|stem|15905dc78bd20b19|03d888c2cc037d4e|ee6b8d54a80ea290|19133857|_stats_outputs/erosion_totals.xlsx|t20749.8871958439s|s5904b|5904|file|local|vector|||0.03||

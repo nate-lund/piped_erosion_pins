@@ -82,7 +82,15 @@ list(
   ### Fit stats models (approach 1) ==== 
   tar_target(
     a1_model_outs, # Stored as a list of file paths: coefs_path, data_path, anova_path, spline_path
-    fit_models_a1(differenced_pins)
+    fit_models_a1(differenced_pins),
+    cue = tar_cue(mode = "always")
+  ),
+  
+  ### Fit stats models (approach 2) ==== 
+  tar_target(
+    a2_model_outs, # Stored as a list of file paths: coefs_path, data_path, anova_path, spline_path
+    fit_models_a2(differenced_pins),
+    cue = tar_cue(mode = "always")
   ),
   
   #' ### Fil lslpines to pins ====
@@ -188,21 +196,21 @@ list(
   tar_target(
     all_plots,
     plot_all(indv_plots)
-  ),
+  )
   
-  ### Make flextable erosion totals ====
-  tar_target(
-    erosion_totals_ft,
-    table_erosion_totals(erosion_totals_units),
-    format = "file" # Saved as an .png, so need this.
-  ),
+  # ### Make flextable erosion totals ====
+  # tar_target(
+  #   erosion_totals_ft,
+  #   table_erosion_totals(erosion_totals_units),
+  #   format = "file" # Saved as an .png, so need this.
+  # ),
 
   #' ### Make df for mms over time ====
   # tar_target(
   #   mms_frame,
   #   frame_mmdt(lsplines)
   # ),
-  # 
+   
   #' ### Make flextable for mms over time
   # tar_target(
   #   mms_table,
@@ -210,24 +218,24 @@ list(
   #   format = "file"
   # ),
 
-  ### Build Figure 1 ====
-  tar_target(
-    figure1,
-    build_fig1(all_plots, plot_mmdt)
-  ),
+  # ### Build Figure 1 ====
+  # tar_target(
+  #   figure1,
+  #   build_fig1(all_plots, plot_mmdt)
+  # ),
   
-  ### Pull Figure 2B ====
-  tar_target(
-    figure_2b,
-    "_inputs/figure_2b.png",
-    format = "file"
-  ),
+  # ### Pull Figure 2B ====
+  # tar_target(
+  #   figure_2b,
+  #   "_inputs/figure_2b.png",
+  #   format = "file"
+  # ),
   
-  ### Build Figure 2 ====
-  tar_target(
-    figure2,
-    build_fig2(erosion_totals_ft, figure_2b)
-  )
+  # ### Build Figure 2 ====
+  # tar_target(
+  #   figure2,
+  #   build_fig2(erosion_totals_ft, figure_2b)
+  # )
   
   )
 

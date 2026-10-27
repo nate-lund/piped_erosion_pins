@@ -165,6 +165,30 @@ differenced_QAQC = function(data3) {
   
   return(perform_list)
 }
+
+
+#================================ Look at Boxplot ================================
+
+#' [Test code]
+# data = tar_read(differenced_pins)
+
+dmm_box_plot = function(){
+
+  
+  ggplot() +
+    geom_boxplot(data = data,
+                 mapping = aes(group = interaction(date, slope_pos),
+                               x = date,
+                               y = dmm,
+                               width = 12,
+                               fill = slope_pos)) +
+    facet_wrap(~forest)
+  
+}
+
+
+
+
 #================================ Model Approach 1 ================================
 
 #' [Test code]

@@ -712,7 +712,7 @@ table_erosion_totals = function(path){
 
 plot_mm_dt = function(path, path2){
   
-  data = read_excel(path)
+  data = read_excel(path[[2]])
   
   # Need to make a index column for plotting
   plot_data = data %>% 
@@ -775,12 +775,12 @@ plot_mm_dt = function(path, path2){
           color =  slope_pos),
       linewidth = 0.9) +
     
-    # Plot boxplots for each forest and slope position
-    geom_boxplot(aes(group = forest_date,
-                     width = 3,
-                     fill = slope_pos
-    ),
-    alpha = 1) +
+    # # Plot boxplots for each forest and slope position
+    # geom_boxplot(aes(group = forest_date,
+    #                  width = 3,
+    #                  fill = slope_pos
+    # ),
+    # alpha = 1) +
     
     # Add aignifigance stars
     geom_text(

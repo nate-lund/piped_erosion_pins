@@ -184,6 +184,11 @@ dmm_box_plot = function(){
                                fill = slope_pos)) +
     facet_wrap(~forest)
   
+  data %>%
+    filter(dmm > 10 | dmm < -10
+      
+    )
+  
 }
 
 

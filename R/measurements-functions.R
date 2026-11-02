@@ -206,7 +206,7 @@ fit_models_a1 = function(data){
   data2 = data %>% 
     mutate(array_ID = paste(transect, slope_pos, sep = "_"),
            # Convert t from days to months (helps with model stability, provides more interpret-able estimates)
-           t = t / 30.44) 
+           f = t / 30.44) 
   # Create a list of forests
   forests = unique(data2$forest)
   
@@ -220,26 +220,43 @@ fit_models_a1 = function(data){
     
     # Fit a mixed effects model to determine BS and FS rate of change and significance
     lmer_rates <- lmer(data = datai, REML = TRUE,
-                       mm ~ 0 + slope_pos:t
-                       + (0 + t | index)
-                       + (0 + t | array_ID)
+                       mm ~ 0 + slope_pos:f
+                       + (0 + f | index)
+                       + (0 + f | array_ID)
     )
     
     
     # Fit a mixed effects model to determine BS and FS difference
     lmer_diff <- lmer(data = datai, REML = TRUE,
-                      mm ~ 0 + t + t:slope_pos
-                      + (0 + t | index)
-                      + (0 + t | array_ID)
+                      mm ~ 0 + f + f:slope_pos
+                      + (0 + f | index)
+                      + (0 + f | array_ID)
     )
     
     
     # Fit mixed effects model with a spline
-    knots = unique(datai$t)[2:(length(forests)-1)] # Set knots at measurement days
+    knots = unique(datai$f)[2:(length(forests)-1)] # Set knots at measurement days
     lmer_spline <- lmer(data = datai, REML = TRUE,
-                        mm ~ 0 + slope_pos:lspline(t, knots = knots)
-                        + (0 + t | index)
-                        + (0 + t | array_ID))
+                        mm ~ 0 + slope_pos:lspline(f, knots = knots)
+                        + (0 + f | index)
+                        + (0 + f | array_ID))
+    
+    
+    # # Fit a AR(1) autogressive model, nlme package
+    # nlme_ar1 <- lme(data = datai, method = "REML", na.action = na.omit, 
+    #                 control = lmeControl(opt = "optim"),
+    #                 # Fixed effects
+    #                 mm ~ 0 + slope_pos:f, #t:slope_pos
+    #                 # Random effects
+    #                 random = ~ 0 + f | array_ID, # or index?
+    #                 # Temporal autocorrelation factor
+    #                 correlation = corAR1(form = ~ date | array_ID/index)
+    # )
+    # # Pull real p values with proper df
+    # tt <- summary(nlme_ar1)$tTable
+    # cbind(tt[, c("Value", "t-value")],
+    #       p = 2 * pt(-abs(tt[, "t-value"]), df = 2))
+
     
     # Because of the optimization error, we should double check to ensure it found
     # a correct fit. Likely a false alarm

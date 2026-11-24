@@ -206,7 +206,7 @@ fit_models_a1 = function(data){
   data2 = data %>% 
     mutate(array_ID = paste(transect, slope_pos, sep = "_"),
            # Convert t from days to months (helps with model stability, provides more interpret-able estimates)
-           f = t / 30.44) 
+           t = t / 30.44) 
   # Create a list of forests
   forests = unique(data2$forest)
   
@@ -220,35 +220,35 @@ fit_models_a1 = function(data){
     
     # Fit a mixed effects model to determine BS and FS rate of change and significance
     lmer_rates <- lmer(data = datai, REML = TRUE,
-                       mm ~ 0 + slope_pos:f
-                       + (0 + f | index)
-                       + (0 + f | array_ID)
+                       mm ~ 0 + slope_pos:t
+                       + (0 + t | index)
+                       + (0 + t | array_ID)
     )
     
     
     # Fit a mixed effects model to determine BS and FS difference
     lmer_diff <- lmer(data = datai, REML = TRUE,
-                      mm ~ 0 + f + f:slope_pos
-                      + (0 + f | index)
-                      + (0 + f | array_ID)
+                      mm ~ 0 + t + t:slope_pos
+                      + (0 + t | index)
+                      + (0 + t | array_ID)
     )
     
     
     # Fit mixed effects model with a spline
-    knots = unique(datai$f)[2:(length(forests)-1)] # Set knots at measurement days
+    knots = unique(datai$t)[2:(length(forests)-1)] # Set knots at measurement days
     lmer_spline <- lmer(data = datai, REML = TRUE,
-                        mm ~ 0 + slope_pos:lspline(f, knots = knots)
-                        + (0 + f | index)
-                        + (0 + f | array_ID))
+                        mm ~ 0 + slope_pos:lspline(t, knots = knots)
+                        + (0 + t | index)
+                        + (0 + t | array_ID))
     
     
     # # Fit a AR(1) autogressive model, nlme package
-    # nlme_ar1 <- lme(data = datai, method = "REML", na.action = na.omit, 
+    # nlme::nlme_ar1 <- lme(data = datai, method = "REML", na.action = na.omit, 
     #                 control = lmeControl(opt = "optim"),
     #                 # Fixed effects
-    #                 mm ~ 0 + slope_pos:f, #t:slope_pos
+    #                 mm ~ 0 + slope_pos:t, #t:slope_pos
     #                 # Random effects
-    #                 random = ~ 0 + f | array_ID, # or index?
+    #                 random = ~ 0 + t | array_ID, # or index?
     #                 # Temporal autocorrelation factor
     #                 correlation = corAR1(form = ~ date | array_ID/index)
     # )
@@ -461,16 +461,18 @@ fit_models_a2 = function(data){
     fstest = t.test(fs$array_roc, alternative = c("two.sided"))
     bftest = t.test(bs$array_roc, fs$array_roc, alternative = c("two.sided"), paired = TRUE)
     
+
     # Bind together
     coefs = bind_rows(.id = "slope_pos",
-      BS = tidy(bstest),
-      FS = tidy(fstest),
-      BF = tidy(bftest)
+                BS = tidy(bstest),
+                FS = tidy(fstest),
+                BF = tidy(bftest)
       ) %>% 
       mutate(
-        forest = unique(fs$forest)
+        forest = unique(fs$forest),
+        std_err = estimate / statistic
       ) %>% 
-      select(forest, slope_pos, estimate, statistic, p.value, method)
+      select(forest, slope_pos, estimate, std_err, p.value, method)
     
     ifelse(i == first(forests),
            coefs_out <- coefs,
@@ -489,6 +491,156 @@ fit_models_a2 = function(data){
   return(list(forest_path, array_path))
 }
 
+
+
+#================================ Stuff ================================
+
+#' [Test code]
+# data = tar_read(differenced_pins)
+
+
+# Create measurement periods for each pin
+indexs = unique(data$index)
+
+for(i in indexs){
+  
+  di = data %>% 
+    filter(index == i)
+  
+  
+  pairs <- combn(nrow(di), 2)
+  
+  periodsi = data.frame(
+    start = di$t[pairs[1, ]],
+    end   = di$t[pairs[2, ]],
+    zstart = di$mm[pairs[1, ]],
+    zend   = di$mm[pairs[2, ]]
+  ) %>% 
+    mutate(
+      # Add some comupations
+      dz = zstart - zend,
+      dt = end - start, 
+      dzdt = dz/dt,
+      
+      # Add some field characteristics
+      index = i,
+      forest = unique(di$forest),
+      slope_pos = unique(di$slope_pos),
+      transect = unique(di$transect)
+      
+    )
+  
+  ifelse(i == first(indexs),
+         periods <- periodsi,
+         periods <- merge(periods, periodsi, all = TRUE))
+  
+}
+
+
+
+
+
+# Analysis for one forest
+
+forests = unique(periods$forest)
+
+for(k in forests){
+  
+  # Filter for forest i
+  df = periods %>% 
+    filter(forest == k) %>% 
+    mutate(
+      # Log transform dt and dzdt
+      log_dt = log(dt),
+      log_dzdt = ifelse(dzdt != 0, log(abs(dzdt)), log(0.001))
+    )
+  
+  name = k
+  
+  # Mean (regular lm)
+  lm_log = lm(data = df, log_dzdt ~ log_dt)
+  log_coef = tidy(lm_log)$estimate
+  
+  # Median
+  med_log <- rq(data = df, log_dzdt ~ log_dt, tau = 0.5)
+  log_med_coef = coef(med_log)
+  
+  
+  # Plot
+  plotk = ggplot(data = df, mapping = aes(x = log_dt, y = log_dzdt)) +
+    geom_point() +
+    geom_smooth(method = "lm", formula = y ~ x, se = FALSE) + # Mean
+    geom_quantile(quantiles = 0.5, formula = y ~ x, color = "firebrick") + # Median
+    
+    geom_hline(yintercept = log(abs(eros_rate))) +
+    geom_abline(slope = -1, intercept = log(abs(eros_rate)), linetype = 2) +
+    geom_abline(slope = -0.5, intercept = log(abs(eros_rate)), linetype = 3) +
+    
+    scale_y_continuous(name = "log rate of elevation change") +
+    scale_x_continuous(name = "log measurement period") +
+    labs(
+      title = name,
+      subtitle = paste0("Mean - Intercept: ", round(log_coef[[1]], 3), " | Slope: ", round(log_coef[[2]], 4),
+                        "\n Median - Intercept: ", round(log_med_coef[[1]], 3), " | Slope: ", round(log_med_coef[[2]], 4))
+    )
+  
+  assign(paste0(name, "_logplot"), plotk)
+  
+}
+
+plot_grid(ASH_logplot, LRE_logplot, LRW_logplot, MAG_logplot, WD_logplot, LRJ_logplot, cols = 3)
+
+
+# Non-log plot
+ggplot(data = df, mapping = aes(x = dt, y = dzdt)) +
+  geom_point() +
+  geom_smooth(method = "lm", formula = y ~ 1, se = FALSE) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) 
+  
+# Compute normal intercept
+lm = lm(data = df, dzdt ~ 1)
+rate = tidy(lm)$estimate
+
+
+# Compute log intercept
+lm_log = lm(data = df, log_dzdt ~ log_dt)
+summary(lm_log)
+
+# Log plot
+ggplot(data = df, mapping = aes(x = log_dt, y = log_dzdt, line_type = slope_pos)) +
+  geom_point() +
+  #geom_smooth(method = "lm", formula = y ~ 1, se = FALSE) +
+  geom_smooth(method = "lm", formula = y ~ x, se = FALSE) +
+  
+  geom_hline(yintercept = log(rate)) +
+  geom_abline(slope = -1, intercept = log(rate), linetype = 2) +
+  geom_abline(slope = -0.5, intercept = log(rate), linetype = 3) +
+  facet_wrap(~forest) +
+  
+  scale_y_continuous(name = "log rate of elevation change") +
+  scale_x_continuous(name = "log measurement period") +
+  ggtitle("A")
+
+
+
+
+# All plots...
+ggplot(data = periods) +
+  geom_point(mapping = aes(x = dt, y = dzdt, color = slope_pos)) +
+  facet_wrap(~forest)
+
+
+ggplot(data = periods) +
+  geom_point(mapping = aes(x = log(dt), y = log(abs(dzdt)), shape = slope_pos)) +
+  
+  geom_hline(yintercept = log(0.1)) +
+  geom_abline(slope = -1, intercept = log(0.1), linetype = 2) +
+  geom_abline(slope = -0.5, intercept = log(0.1), linetype = 3) +
+  facet_wrap(~forest)
+  
+  scale_y_continuous(name = "log rate of elevation change") +
+  scale_x_continuous(name = "log measurement period") +
+  ggtitle(j)
 
 #' #================================ Fit lsplines to MMs ================================
 #' 

@@ -4,7 +4,7 @@
 Sys.setenv(PROJ_LIB = "C:/Users/natha/AppData/Local/R/win-library/4.6/terra/proj")
 
 # libraries needed
-libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial", "stringr", "ggh4x", "ggrepel", "magick", "broom.mixed", "nlme", "lmerTest")
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial", "stringr", "ggh4x", "ggrepel", "magick", "broom.mixed", "lmerTest", "quantreg")
 
 # install missing libraries
 installed_libs <- libs %in% rownames(installed.packages())
@@ -99,13 +99,7 @@ list(
   #   fit_lspines(differenced_pins),
   #   format = "file"
   # ),
-
-  ### Plot mms over time for each forests ====
-  tar_target(
-    plot_mmdt,
-    plot_mm_dt(a1_model_outs[[2]], a1_model_outs[[4]])
-  ),
-  
+  #
   #' ### Compute overall change (mm) by transect ====
   # # This is used for plotting
   # tar_target(
@@ -184,20 +178,26 @@ list(
   ##================================ Plotting Functions ================================
   # Create figures 1 and 2 and derivative plots.
   
-  ### Plots rasters and point data together, unique plot for each forest ====
+  ### Plot mms over time for each forests ====
   tar_target(
-    indv_plots,
-    plot_each(points_plus_mms, cdfs),
-    pattern = map(cdfs),
-    iteration = "list"
-  ),
-  
-  ### Plot all DEMs together ====
-  tar_target(
-    all_plots,
-    plot_all(indv_plots)
+    plot_mmdt,
+    plot_mm_dt(a1_model_outs[[2]], a1_model_outs[[4]])
   )
   
+  # ### Plots rasters and point data together, unique plot for each forest ====
+  # tar_target(
+  #   indv_plots,
+  #   plot_each(points_plus_mms, cdfs),
+  #   pattern = map(cdfs),
+  #   iteration = "list"
+  # ),
+  # 
+  # ### Plot all DEMs together ====
+  # tar_target(
+  #   all_plots,
+  #   plot_all(indv_plots)
+  # )
+
   # ### Make flextable erosion totals ====
   # tar_target(
   #   erosion_totals_ft,

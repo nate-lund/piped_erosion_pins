@@ -1,0 +1,271 @@
+---
+title: "short-comm-functions"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# chunk options
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, width = 300, warning = FALSE, out.width = "75%", fig.show = 'hold', fig.align = "center")
+
+# libraries needed
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial", "stringr", "ggh4x", "ggrepel", "magick", "broom.mixed", "lmerTest", "quantreg")
+
+# install missing libraries
+installed_libs <- libs %in% rownames(installed.packages())
+if (any(installed_libs == F)) {
+  install.packages(libs[!installed_libs])
+}
+
+# load libraries
+lapply(libs, library, character.only = T)
+```
+
+The following is a series of equations and R code functions used in the Geoderma Short Communication Manuscript.
+
+## Bioturbation, Freeze-thaw, & Snow/rain compaction
+
+$$\Delta \rho = \rho_{i} \cdot \frac{D_p}{D_p + \Delta z} - \rho_{i}$$
+
+Where ∆ρ is the required change in bulk density, ρinitial is the bulk density prior to external forcing, Dp is the depth to which the external forcing impacts ρ, and ∆z is the measured elvation change.
+
+```{r}
+# Set parameters
+dz = -0.5 # cm
+Dp = 5 # cm
+rho_i = 0.91 # g/cm^3
+
+# Compute in g/cm^3
+delta_rho = rho_i * (Dp / (Dp + dz)) - rho_i
+
+# Print
+paste0("Delta rho = ", signif(delta_rho, 3), " g/cm3")
+
+```
+
+## Organic matter additions and losses
+
+$$\Delta SOM = \exp\left(\frac{P_f - 0.9653}{0.1224}\right) - \exp\left(\frac{P_i - 0.9653}{0.1224}\right)$$
+
+$$\Delta P = 1 -\frac{\Delta \rho}{\rho_{s}} $$ Where ∆SOM in the required change in soil organic matter proportion, ∆P is the change in porosity, and ρs is the particle density (g/cm\^3).
+
+```{r}
+# Set parameters
+dz = -0.5 # cm
+Dp = 5 # cm
+rho_i = 0.65 # g/cm^3
+rho_s = 2.61 # g/cm^3
+
+# Compute initial and final bulk density (g/cm^3)
+rho_f = rho_i * (Dp / (Dp + dz))
+
+# Compute initial and final porosity (unit less proportion)
+  = 1 - rho_i / rho_s
+P_f =  1 - rho_f / rho_s # rho_s would technically change, but the final SOM is relativley insensitive
+
+# Compute change in SOM fraction (cm^3/cm^3)
+delta_SOM = exp((P_f - 0.9653)/0.1224) - exp((P_i - 0.9653)/0.1224)
+
+# Print
+paste0("Delta SOM = ", signif(delta_SOM, 3), " cm3/cm3")
+
+```
+
+## Root growth and decay
+
+$$\Delta r_l = \frac{\Delta z}{\pi r^2}$$
+
+Where ∆rl is the change in root length (in length per ground area), ∆z is measured elevation change, and r is root radius.
+
+```{r}
+# Set parameters
+dz = -0.5 # cm
+r = 0.1 # cm
+
+# Compute in cm/cm^2
+dr = dz / (pi * r^2)
+
+# Convert to mm/cm^2
+dr_mm = dr * 10
+
+# Convert to km/m^2
+dr_km = dr * (1/100000) * (10000)
+
+# Compute in to g/m^2 assuming root biomass density = 1
+dr_g = dz * 1 * 10000
+
+# Print
+paste0("Delta r = ", signif(dr, 3), " cm/cm2")
+paste0("Delta r = ", signif(dr_mm, 3), " mm/cm2")
+paste0("Delta r = ", signif(dr_km, 3), " km/m2")
+paste0("Delta r = ", signif(dr_g, 3), " g/m2")
+
+```
+
+
+## Volumetric strain & Erosion figure
+
+```{r}
+
+# Create Synthetic Data
+eros_rate = -0.25 # Set long term erosion rate
+time_steps = 100 # Number of time steps
+sim_times = 500 # Number of simulated time periods
+
+
+dfigure = data.frame(time = seq(1, time_steps, by = 1)) %>% 
+  mutate(
+    # Volumetric change
+    net_volume = 0,
+    gross_volume = 3*sin(0.4 * time),
+    
+    # Erosion
+    net_erosion = eros_rate * time,
+    gross_erosion = net_erosion + 3*sin(0.15 * time),
+    
+    # Measured
+    total = gross_volume + gross_erosion,
+    total_diff = c(0, diff(total))
+    
+  )
+
+#tibble(dfigure)
+
+plota = ggplot(data = dfigure) +
+  geom_line(mapping = aes(x = time, y = net_volume), color = "red") +
+  geom_line(mapping = aes(x = time, y = gross_volume), color = "red") +
+  geom_line(mapping = aes(x = time, y = net_erosion), color = "blue") +
+  geom_line(mapping = aes(x = time, y = gross_erosion), color = "blue") +
+  geom_line(mapping = aes(x = time, y = total), linewidth = 1.3) +
+  scale_y_continuous(
+    name = "elevation"
+  )
+
+
+
+# Simulate some "measured" data ranges
+time_pairs = replicate(sim_times, sort(sample(time_steps, 2))) 
+
+dtest = data.frame(
+  start = time_pairs[1, ],
+  end = time_pairs[2, ]
+  ) %>%
+  
+  mutate(
+    dt = end - start
+  )
+
+
+
+# Pull simulated data values over the simulated data ranges
+sets = c("gross_volume", "gross_erosion", "total")
+# Loop for each variable of interest
+for(j in sets){
+  
+  dj = dtest
+  
+  # Loop for each row in the dtest table
+  for(i in 1:sim_times){
+    
+    # Pull j start
+    dj[i,"zstart"] = dfigure %>% 
+      filter(time == dtest[i, "start"]) %>% 
+      dplyr::select(j)
+    
+    # Pull j end
+    dj[i,"zend"] = dfigure %>% 
+      filter(time == dtest[i, "end"]) %>% 
+      dplyr::select(j)
+    
+  }
+  
+  # Return the a new dataset
+  dj = dj %>% mutate(
+    dz = zend - zstart,
+    dzdt = dz / dt,
+   
+    # Log transform dt and dzdt
+    log_dt = log(dt),
+    log_dzdt = log(abs(dzdt))
+
+    )
+  
+  
+  
+  # Non-log computations
+  # Compute intercept
+  lm = lm(data = dj, dzdt ~ 1)
+  rate = tidy(lm)$estimate
+
+  plotj <- ggplot(data = dj) +
+    geom_point(aes(x = dt, y = dzdt)) +
+    geom_hline(yintercept = eros_rate) +
+    scale_y_continuous(name = "rate of elevation change") +
+    scale_x_continuous(name = "measurement period") +
+    labs(
+      title = j,
+      subtitle = paste0("Intercept: ", rate)
+    )
+  
+  
+  
+  
+  
+  # Log computations
+  # Compute intercept and slope
+  # Mean (regular lm)
+  lm_log = lm(data = dj, log_dzdt ~ log_dt)
+  log_coef = tidy(lm_log)$estimate
+  
+  # Median
+  med_log <- rq(data = dj, log_dzdt ~ log_dt, tau = 0.5)
+  log_med_coef = coef(med_log)
+  
+  # Plot
+  plotj2 = ggplot(data = dj, mapping = aes(x = log_dt, y = log_dzdt)) +
+    geom_point() +
+    geom_smooth(method = "lm", formula = y ~ x, se = FALSE) + # Mean
+    geom_quantile(quantiles = 0.5, formula = y ~ x, color = "firebrick") + # Median
+    
+    geom_hline(yintercept = log(abs(eros_rate))) +
+    geom_abline(slope = -1, intercept = log(abs(eros_rate)), linetype = 2) +
+    geom_abline(slope = -0.5, intercept = log(abs(eros_rate)), linetype = 3) +
+    
+    scale_y_continuous(name = "log rate of elevation change") +
+    scale_x_continuous(name = "log measurement period") +
+        labs(
+      title = j,
+      subtitle = paste0("Mean - Intercept: ", round(log_coef[[1]], 3), " | Slope: ", round(log_coef[[2]], 4),
+                        "\n Median - Intercept: ", round(log_med_coef[[1]], 3), " | Slope: ", round(log_med_coef[[2]], 4))
+    )
+
+  
+  
+  
+  # Make global variables
+  assign(paste0(j, "_data"), dj)
+  assign(paste0(j, "_plot"), plotj)
+  assign(paste0(j, "_plot2"), plotj2)
+  
+  }
+
+# gross_volume_data
+# gross_erosion_data
+# total_data
+
+
+# Plot all
+signed_rates = plot_grid(total_plot, gross_volume_plot, gross_erosion_plot, cols = 2)
+signed_rates2 = plot_grid(total_plot2, gross_volume_plot2, gross_erosion_plot2, cols = 2)
+
+plot_grid(plota, signed_rates2)
+# plota
+# signed_rates
+# signed_rates2
+
+
+```
+
+Observations:
+1. The period/frequency of the cyclical pattern of total elevation change can be seen in simulated data. Elevation data simulated over a time period equal to the period (or to some combination of the periods) has very low variance.
+2. The mean elevation change also increases significantly with dt.
+

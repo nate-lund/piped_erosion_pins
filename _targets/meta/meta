@@ -43,31 +43,32 @@ indv_plots_80409a4a775b9eca|branch|71a5b4529062c0a2|94c0f25332d8f045|6c7d380a88c
 indv_plots_a9227a4e0becc29a|branch|f67cb8dc0b489575|94c0f25332d8f045|f6250641e259cfc5|913911112||t20745.1702547967s|s2119766b|2119766|rds|local|list|indv_plots||0.3|attribute variables are assumed to be spatially constant throughout all geometries|
 indv_plots|pattern|b23dcf044dfa73fb|94c0f25332d8f045||183193026||||12660100|rds|local|list||indv_plots_3ec53da55a645a85*indv_plots_d85dd1aad079ed34*indv_plots_7d0f38ebb2c3231a*indv_plots_ade62be95181540b*indv_plots_80409a4a775b9eca*indv_plots_a9227a4e0becc29a|1.93||
 all_plots|stem|24b5c05fa6f0633d|19f8fe7fed37a86f|8379efad134f136e|785210724||t20745.170397581s|s20798312b|20798312|rds|local|vector|||1.95||
-plot_mmdt|stem|5b953498fe606948|a748b10f0b695b41|78d6779428d754d0|-626711285||t20748.7913798784s|s872207b|872207|rds|local|vector|||1.9|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
 figure1|stem|d26fa844d0bb3f00|b9716b2017335b44|b3c9a5fae8d60fa0|-598071735||t20748.7915425806s|s24905408b|24905408|rds|local|vector|||1.86|Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).. Removed 2 rows containing missing values or values outside the scale range (`geom_segment()`).. Removed 1 row containing missing values or values outside the scale range (`geom_segment()`).|
-build_fig1|function|965cfa55e13b1047
-build_fig2|function|921bca234971e414
 erosion_totals_ft|stem|751795332bf88baa|9575051c6928dfe9|28b418a70e34dccf|1220970016|_plot_outputs/erosion_totals.png|t20745.0314843192s||167002|file|local|vector|||0.08||ℹ In argument: `dt = round(dt, digits = 0)`. Caused by error in `round()`: ! non-numeric argument to mathematical function
+erosion_totals_units|stem|15905dc78bd20b19|03d888c2cc037d4e|ee6b8d54a80ea290|19133857|_stats_outputs/erosion_totals.xlsx|t20749.8871958439s|s5904b|5904|file|local|vector|||0.03||
 libs|object|a9e4cf37a4fbfe79
 extract_slope|function|cbe8d3e2b41b2a39
 plot_each|function|ed4e6d985d586fe4
 convert_units|function|4791414614400d16
+build_fig1|function|965cfa55e13b1047
+build_fig2|function|921bca234971e414
 pin_accuracy|function|4c9a57153264e56e
 pull_dems|function|9e1ba69db3e0c93b
 table_erosion_totals|function|dae7933748c86e29
-.Random.seed|object|ad100357b212323c
+.Random.seed|object|6003e310585f6dd9
 fit_models_a1|function|131e2c917718c4e0
 data_cleanup|function|d79879436e6511c9
-fit_models_a2|function|cf2c07a12bd133f9
+fit_models_a2|function|23aeee720083310e
 installed_libs|object|933863c44e17ca7f
 plot_all|function|ca44bfc36dd6fe1a
 table_mmdt|function|b9422e0c91e56483
-plot_mm_dt|function|44a2cc63ad4491fe
+plot_mm_dt|function|0a89bf15b881d9c6
 differenced_QAQC|function|f144e471472b7d80
+dmm_box_plot|function|07ea7bde7fd964c8
 frame_mmdt|function|f49233ef6e026a83
 pull_measurements|function|5daa43931379d2e1
 difference_pins|function|181d10a8bb2c88ec
-cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20749.8871514289s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
-a1_model_outs|stem|c68a20f9c961e70d|6134183e2edbb9ff|08e9d4f7f3ab9356|-934907244||t20749.8871659766s|s123b|123|rds|local|vector|||1.22||
-a2_model_outs|stem|f4f515bdc58271f4|8a2cff7a8c7bca18|6e5feff35108aa08|1598635696||t20749.8871949844s|s105b|105|rds|local|vector|||2.47||
-erosion_totals_units|stem|15905dc78bd20b19|03d888c2cc037d4e|ee6b8d54a80ea290|19133857|_stats_outputs/erosion_totals.xlsx|t20749.8871958439s|s5904b|5904|file|local|vector|||0.03||
+cdfs_files|stem|c5fd4d3885964781|50c28e3106e7e941|89f9b426e27f8330|-274305850||t20759.6929668341s|s104b|104|rds|local|vector||cdfs_files_b92951cc25e582e7*cdfs_files_4d8410341eb1bea1*cdfs_files_2f637d550419a772*cdfs_files_b3b36792a5688207*cdfs_files_320b5db88148edf7*cdfs_files_180aa28b970d7cfa|0||
+a1_model_outs|stem|c68a20f9c961e70d|6134183e2edbb9ff|08e9d4f7f3ab9356|-934907244||t20759.692977722s|s123b|123|rds|local|vector|||0.92||
+a2_model_outs|stem|f4f515bdc58271f4|8a2cff7a8c7bca18|c79b06e9d4935584|1598635696||t20759.6930017356s|s105b|105|rds|local|vector|||2.05||
+plot_mmdt|stem|231ec4208e23c660|a748b10f0b695b41|bafdd38780343458|-626711285||t20759.6930216085s|s835577b|835577|rds|local|vector|||1.5||

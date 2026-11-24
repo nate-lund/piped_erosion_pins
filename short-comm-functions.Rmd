@@ -108,7 +108,7 @@ paste0("Delta r = ", signif(dr_g, 3), " g/m2")
 
 # Create Synthetic Data
 eros_rate = -0.25 # Set long term erosion rate
-time_steps = 100 # Number of time steps
+time_steps = 1000 # Number of time steps
 sim_times = 500 # Number of simulated time periods
 
 
@@ -138,6 +138,10 @@ plota = ggplot(data = dfigure) +
   geom_line(mapping = aes(x = time, y = total), linewidth = 1.3) +
   scale_y_continuous(
     name = "elevation"
+  ) +
+  labs(
+      title = "Conceptual Figure",
+      subtitle = paste0("Erosion rate:", eros_rate, " | Time steps:", time_steps, " | Sim. Times: ", sim_times)
   )
 
 

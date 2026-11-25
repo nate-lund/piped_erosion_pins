@@ -40,6 +40,10 @@ tar_source(
     "R/plotting-functions.R"
     )
 
+tar_source(
+  # Contains functions that relate to simulations and "salder" models
+  "R/model-functions.R"
+)
 
 #' [WHEN RUNNING FOR THE FIRST TIME]
 # Run commented out code below to clear storage:
@@ -236,6 +240,11 @@ list(
   #   figure2,
   #   build_fig2(erosion_totals_ft, figure_2b)
   # )
+  
+  
+  ##================================ Plotting Functions ================================
+  
+  
   
   )
 

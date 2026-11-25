@@ -1,0 +1,220 @@
+---
+title: "erosion-simulation"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+# chunk options
+knitr::opts_chunk$set(eval = FALSE, echo = TRUE, width = 300, warning = FALSE, out.width = "75%", fig.show = 'hold', fig.align = "center")
+
+# libraries needed
+libs <- c("httr", "jsonlite", "ggplot2", "terra", "leaflet", "ncdf4", "tidyr", "dplyr", "readr", "targets", "usethis", "sf", "targets", "visNetwork", "tarchetypes", "tidyterra", "performance", "see", "RColorBrewer", "lme4", "nlme", "readxl", "writexl", "emmeans", "splines", "lspline", "ggeffects", "lubridate", "cowplot", "gridGraphics", "broom", "DT", "flextable", "wesanderson", "ggspatial", "extrafont", "officer", "svglite", "ggspatial", "stringr", "ggh4x", "ggrepel", "magick", "broom.mixed", "lmerTest", "quantreg")
+
+# install missing libraries
+installed_libs <- libs %in% rownames(installed.packages())
+if (any(installed_libs == F)) {
+  install.packages(libs[!installed_libs])
+}
+
+# load libraries
+lapply(libs, library, character.only = T)
+```
+
+
+## Simulating Volumetric strain & Erosion
+
+
+```{r}
+
+# Create Synthetic Data
+# Simuilation parameters
+eros_rate = -0.25 # Set long term erosion rate
+time_steps = 100 # Number of time steps
+sim_times = 500 # Number of simulated time periods
+
+# Sin wave shapes
+A_vol = 3
+P_vol = 10
+p_vol = 0 # Not included
+
+A_ero = 5
+P_ero = 50
+p_ero = 0 # Not included
+
+dfigure = data.frame(time = seq(1, time_steps, by = 1)) %>% 
+  mutate(
+    # Volumetric change
+    net_volume = 0,
+    gross_volume = A_vol * sin((2 * pi / P_vol) * time),
+    
+    # Erosion
+    net_erosion = eros_rate * time,
+    gross_erosion = net_erosion + A_ero * sin((2 * pi / P_ero) * time),
+    
+    # Measurement Error, random and normally distributed
+    error = rnorm(time_steps, mean = 0, sd = 1.5),
+    
+    # Measured
+    total = gross_volume + gross_erosion,
+    total_diff = c(0, diff(total)),
+    total_err = total + error,
+    
+  )
+
+#tibble(dfigure)
+
+plota = ggplot(data = dfigure) +
+  # Volume
+  geom_line(mapping = aes(x = time, y = net_volume), color = "red", linetype = 2) +
+  geom_line(mapping = aes(x = time, y = gross_volume), color = "red") +
+  # Erosion
+  geom_line(mapping = aes(x = time, y = net_erosion), color = "blue", linetype = 2) +
+  geom_line(mapping = aes(x = time, y = gross_erosion), color = "blue") +
+  
+  # Error
+  geom_point(mapping = aes(x = time, y = error), color = "green4") +
+  
+  # Total
+  geom_line(mapping = aes(x = time, y = total_err), linewidth = 1.2, color = "green4") +
+  geom_line(mapping = aes(x = time, y = total), linewidth = 1.3) +
+ 
+  
+  scale_y_continuous(
+    name = "elevation"
+  ) +
+  labs(
+      title = "Conceptual Figure",
+      subtitle = paste0("Erosion rate: ", eros_rate, " | Time steps: ", time_steps, " | Sim. Times: ", sim_times)
+  )
+
+plota
+
+```
+
+
+```{r}
+
+# Simulate some "measured" data ranges
+time_pairs = replicate(sim_times, sort(sample(time_steps, 2))) 
+
+dtest = data.frame(
+  start = time_pairs[1, ],
+  end = time_pairs[2, ]
+  ) %>%
+  
+  mutate(
+    dt = end - start
+  )
+
+# Pull simulated data values over the simulated data ranges
+sets = c("gross_volume", "gross_erosion", "error", "total") 
+# Loop for each variable of interest
+for(j in sets){
+  
+  dj = dtest
+  
+  # Loop for each row in the dtest table
+  for(i in 1:sim_times){
+    
+    # Pull j start
+    dj[i,"zstart"] = dfigure %>% 
+      filter(time == dtest[i, "start"]) %>% 
+      dplyr::select(j)
+    
+    # Pull j end
+    dj[i,"zend"] = dfigure %>% 
+      filter(time == dtest[i, "end"]) %>% 
+      dplyr::select(j)
+    
+  }
+  
+  # Return the a new dataset
+  dj = dj %>% mutate(
+    dz = zend - zstart,
+    dzdt = dz / dt,
+   
+    # Log transform dt and dzdt
+    log_dt = log(dt),
+    log_dzdt = log(abs(dzdt) + 0.0001)
+
+    )
+  
+  
+  
+  # Non-log computations
+  # Compute intercept
+  lm = lm(data = dj, dzdt ~ 1)
+  rate = tidy(lm)$estimate
+
+  plotj <- ggplot(data = dj) +
+    geom_point(aes(x = dt, y = dzdt)) +
+    geom_hline(yintercept = eros_rate) +
+    scale_y_continuous(name = "rate of elevation change") +
+    scale_x_continuous(name = "measurement period") +
+    labs(
+      title = j,
+      subtitle = paste0("Intercept: ", rate)
+    )
+  
+  
+  
+  
+  
+  # Log computations
+  # Compute intercept and slope
+  # Mean (regular lm)
+  lm_log = lm(data = dj, log_dzdt ~ log_dt)
+  log_coef = tidy(lm_log)$estimate
+  
+  # Median
+  med_log <- rq(data = dj, log_dzdt ~ log_dt, tau = 0.5)
+  log_med_coef = coef(med_log)
+  
+  # Plot
+  plotj2 = ggplot(data = dj, mapping = aes(x = log_dt, y = log_dzdt)) +
+    geom_point() +
+    geom_smooth(method = "lm", formula = y ~ x, se = FALSE) + # Mean
+    geom_quantile(quantiles = 0.5, formula = y ~ x, color = "firebrick") + # Median
+    
+    geom_hline(yintercept = log(abs(eros_rate))) +
+    geom_abline(slope = -1, intercept = log(abs(eros_rate)), linetype = 2) +
+    geom_abline(slope = -0.5, intercept = log(abs(eros_rate)), linetype = 3) +
+    
+    scale_y_continuous(name = "log rate of elevation change") +
+    scale_x_continuous(name = "log measurement period") +
+    labs(
+      title = j,
+      subtitle = paste0("Mean - Intercept: ", round(log_coef[[1]], 3),
+                        " | Slope: ", round(log_coef[[2]], 4),
+                        "\n Median - Intercept: ", round(log_med_coef[[1]], 3),
+                        " | Slope: ", round(log_med_coef[[2]], 4))
+    )
+  
+  
+  
+  
+  # Make global variables
+  assign(paste0(j, "_data"), dj)
+  assign(paste0(j, "_plot"), plotj)
+  assign(paste0(j, "_plot2"), plotj2)
+  
+  }
+
+# gross_volume_data
+# gross_erosion_data
+# total_data
+
+# Plot all
+plot_grid(total_plot, gross_volume_plot, gross_erosion_plot, error_plot, cols = 2)
+plot_grid(total_plot2, gross_volume_plot2, gross_erosion_plot2, error_plot2, cols = 2)
+
+
+# plota
+# signed_rates
+# signed_rates2
+
+
+```
+
+Observations:
+1. The period/frequency of the cyclical pattern of total elevation change can be seen in simulated data. Elevation data simulated over a time period equal to the period (or to some combination of the periods) has very low variance.
